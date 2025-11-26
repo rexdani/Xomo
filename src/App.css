@@ -1,0 +1,14 @@
+/* App component specific styles */
+.App {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* Ensure no dark mode issues */
+@media (prefers-color-scheme: dark) {
+  .App {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+  }
+}
