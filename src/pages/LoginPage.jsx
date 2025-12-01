@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 import "../styles/login.css";
-const host = window.location.hostname;
-const backendPort = 8081;
+import { BASE_URL } from "../util/config.js";
+
 export default function LoginPage() {
   const [form, setForm] = useState({
     email: "",
@@ -27,7 +27,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `http://${host}:${backendPort}/auth/login`,
+        `${BASE_URL}/auth/login`,
         form,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -54,7 +54,7 @@ export default function LoginPage() {
   const idToken = response.credential;
 
   // Send Google ID Token → Spring Boot
-  axios.post(`http://${host}:${backendPort}/auth/google`, { idToken })
+  axios.post(`${BASE_URL}/auth/google`, { idToken })
     .then((res) => {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);

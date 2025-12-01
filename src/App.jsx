@@ -6,6 +6,10 @@ import CategoryProducts from "./pages/CategoryProducts";
 import ProductDetails from "./pages/ProductDetails";
 import CartPage from "./pages/CartPage";
 import ProfilePage from "./pages/ProfilePage";
+import CheckoutPage  from "./pages/CheckoutPage";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
+import OrdersPage from "./pages/OrdersPage";
+
 
 function App() {
   return (
@@ -19,6 +23,11 @@ function App() {
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-success" element={<OrderSuccessPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+
+
       </Routes>
     </BrowserRouter>
   );

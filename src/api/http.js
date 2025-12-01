@@ -7,7 +7,7 @@ const host = window.location.hostname;
 const backendPort = 8081;
 
 // Build backend URL dynamically
-const baseURL = `http://${host}:${backendPort}`;
+const baseURL = `${BASE_URL}`;
 
 console.log("🔗 Backend Connected:", baseURL);
 

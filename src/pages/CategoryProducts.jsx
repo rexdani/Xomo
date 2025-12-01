@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, ShoppingCart, Heart, Star, Grid, List } from "lucide-react";
 import "../styles/categoryProducts.css";
+import { BASE_URL } from "../util/config.js";
 
-const host = window.location.hostname;
-const backendPort = 8081;
+
 
 export default function CategoryProducts() {
   const { id } = useParams();
@@ -34,14 +34,14 @@ export default function CategoryProducts() {
 
       // Fetch category details
       const categoryRes = await axios.get(
-        `http://${host}:${backendPort}/categories/${id}`,
+        `${BASE_URL}/categories/${id}`,
         authHeader
       );
       setCategoryName(categoryRes.data.name);
 
       // Fetch products under this category
       const productRes = await axios.get(
-        `http://${host}:${backendPort}/categories/${id}/products`,
+        `${BASE_URL}/categories/${id}/products`,
         authHeader
       );
 

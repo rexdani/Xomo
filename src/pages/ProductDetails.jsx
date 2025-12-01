@@ -3,9 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ChevronLeft, ShoppingCart, Star, Truck, ShieldCheck, Heart } from "lucide-react";
 import "../styles/productDetails.css";
+import { BASE_URL } from "../util/config.js";
 
-const host = window.location.hostname;
-const backendPort = 8081;
+
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -33,7 +33,7 @@ export default function ProductDetails() {
       }
 
       const res = await axios.get(
-        `http://${host}:${backendPort}/products/${id}`,
+        `${BASE_URL}/products/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -48,9 +48,7 @@ export default function ProductDetails() {
         price: Number(productData.price) || 0,
         description: String(productData.description || "Premium quality product."),
         rating: Number(productData.rating) || 4.5,
-        imageUrl: productData.imageBase64 
-          ? `data:image/jpeg;base64,${String(productData.imageBase64)}`
-          : "/placeholder-product.jpg",
+        imageUrl: String(`data:image/jpeg;base64,${productData.imageBase64 || ""}`),
         category: String(productData.category || "Fashion"),
         brand: String(productData.brand || "XOMO"),
         stock: Number(productData.stock) || 10
@@ -79,7 +77,7 @@ export default function ProductDetails() {
       try {
         // Try endpoint 1: /products/similar/{id}
         const res1 = await axios.get(
-          `http://${host}:${backendPort}/products/${currentProductId}/similar`,
+          `${BASE_URL}/products/${currentProductId}/similar`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         similarProductsData = res1.data || [];
@@ -89,7 +87,7 @@ export default function ProductDetails() {
         try {
           // Try endpoint 2: /categories/{category}/products
           const res2 = await axios.get(
-            `http://${host}:${backendPort}/products/${currentProductId}/similar`,
+            `${BASE_URL}/products/${currentProductId}/similar`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           similarProductsData = res2.data || [];
@@ -162,7 +160,7 @@ export default function ProductDetails() {
       }
 
       await axios.post(
-        `http://${host}:${backendPort}/cart/add`,
+        `${BASE_URL}/cart/add`,
         { 
           userId: String(userId), 
           productId: String(product.id), 
@@ -269,14 +267,11 @@ export default function ProductDetails() {
             
             {/* LEFT - IMAGE */}
             <div className="details-image-box">
-              <img 
-                src={product.imageUrl} 
-                alt={product.name} 
-                className="details-image"
-                onError={(e) => {
-                  e.target.src = '/placeholder-product.jpg';
-                }}
-              />
+              <img
+  src={product.imageUrl}
+  alt={product.name}
+/>
+
             </div>
 
             {/* RIGHT - INFO */}

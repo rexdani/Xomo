@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Mail, Lock, User, Phone, MapPin, ArrowRight, Eye, EyeOff } from "lucide-react";
 import "../styles/register.css";
-const host = window.location.hostname;
-const backendPort = 8081;
+import { BASE_URL } from "../util/config.js";
 export default function RegisterPage() {
   const [user, setUser] = useState({
     fullName: "",
@@ -46,7 +45,7 @@ export default function RegisterPage() {
       };
 const host = window.location.hostname;
       const response = await axios.post(
-        `http://${host}:${backendPort}/auth/register`,
+        `${BASE_URL}/auth/register`,
         payload,
         {
           headers: {

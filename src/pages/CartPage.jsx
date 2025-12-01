@@ -14,9 +14,7 @@ import {
   RotateCcw
 } from "lucide-react";
 import "../styles/cart.css";
-
-const host = window.location.hostname;
-const backendPort = 8081;
+import { BASE_URL } from "../util/config.js";
 
 export default function CartPage() {
   const [items, setItems] = useState([]);
@@ -39,31 +37,66 @@ export default function CartPage() {
     return { headers: { Authorization: token ? `Bearer ${token}` : "" } };
   };
 
+  // Fixed image function
+  const getProductImage = async (productId) => {
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/products/image/${productId}`,
+        {
+          ...authHeader(),
+          responseType: "arraybuffer"
+        }
+      );
+      
+      // Convert arraybuffer to base64
+      const base64 = btoa(
+        new Uint8Array(response.data).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ''
+        )
+      );
+      
+      return `data:image/jpeg;base64,${base64}`;
+    } catch (error) {
+      console.error("Error loading product image:", error);
+      return "/placeholder-image.jpg"; // Return empty string or placeholder image
+    }
+  };
+
   const loadCart = async (uid) => {
     setIsLoading(true);
     try {
-      const res = await axios.get(`http://${host}:${backendPort}/cart`, authHeader());
+      const res = await axios.get(`${BASE_URL}/cart`, authHeader());
+      let items = Array.isArray(res.data)
+        ? res.data
+        : res.data?.items || res.data?.content || [];
 
-      let items = [];
-      if (Array.isArray(res.data)) {
-        items = res.data;
-      } else if (Array.isArray(res.data?.items)) {
-        items = res.data.items;
-      } else if (Array.isArray(res.data?.content)) {
-        items = res.data.content;
-      } else {
-        console.error("Unknown cart response", res.data);
-        items = [];
-      }
+      // Fetch images for all cart items
+      // Fetch images & product details for all cart items
+const formatted = items.map((it) => {
+  if (!it.product) {
+    console.error("Missing product in cart item:", it);
+    return null;
+  }
 
-      const formatted = items.map((it) => ({
-        ...it,
-        imageUrl: it.imageBase64
-          ? `data:image/jpeg;base64,${it.imageBase64}`
-          : "/placeholder-product.jpg",
-        qty: it.qty || 1,
-        totalPrice: (it.price || 0) * (it.qty || 1)
-      }));
+  const product = it.product;
+
+  return {
+    ...it,
+    productId: product.id,
+    name: product.name,
+    price: product.price,
+    qty: it.quantity || 1,
+    totalPrice: (product.price || 0) * (it.quantity || 1),
+
+    // Use BASE64 image directly from backend
+    imageUrl: product.image
+      ? `data:image/jpeg;base64,${product.image}`
+      : "/placeholder-image.jpg",
+  };
+});
+
+
 
       setItems(formatted);
     } catch (err) {
@@ -91,7 +124,7 @@ export default function CartPage() {
     updateQtyLocal(itemId, newQty);
     try {
       await axios.put(
-        `http://${host}:${backendPort}/cart/update/${itemId}`,
+        `${BASE_URL}/cart/update/${itemId}`,
         { quantity: newQty },
         authHeader()
       );
@@ -104,7 +137,7 @@ export default function CartPage() {
   const removeItem = async (itemId) => {
     if (!confirm("Remove this item from cart?")) return;
     try {
-      await axios.delete(`http://${host}:${backendPort}/cart/remove/${itemId}`, authHeader());
+      await axios.delete(`${BASE_URL}/cart/remove/${itemId}`, authHeader());
       setItems((prev) => prev.filter((it) => it.id !== itemId));
     } catch (err) {
       console.error("Remove failed", err);
@@ -115,7 +148,7 @@ export default function CartPage() {
     if (!coupon.trim()) return alert("Enter coupon code");
     try {
       const res = await axios.post(
-        `http://${host}:${backendPort}/cart/apply-coupon`,
+        `${BASE_URL}/cart/apply-coupon`,
         { userId, coupon },
         authHeader()
       );
@@ -134,29 +167,14 @@ export default function CartPage() {
   const checkout = async () => {
     if (!userId) {
       alert("Please login to checkout");
-      navigate("/login");
+      navigate("/");
       return;
     }
     if (items.length === 0) return alert("Cart is empty");
     
     setProcessing(true);
     try {
-      const payload = {
-        userId,
-        items: items.map((it) => ({ productId: it.productId, quantity: it.qty })),
-        coupon: coupon || null,
-      };
-      const res = await axios.post(
-        `http://${host}:${backendPort}/orders/create`,
-        payload,
-        authHeader()
-      );
-      
-      alert(res.data.message || "Order placed successfully!");
-      setItems([]);
-      setCoupon("");
-      setDiscountAmt(0);
-      // navigate('/orders');
+      navigate('/checkout');
     } catch (err) {
       console.error("Checkout failed", err);
       alert(err.response?.data?.message || "Checkout failed. Please try again.");
@@ -225,10 +243,14 @@ export default function CartPage() {
                     {items.map((item) => (
                       <div className="cart-item" key={item.id}>
                         <div className="item-image">
+                          {/* Fixed: Use the pre-loaded imageUrl */}
                           <img 
                             src={item.imageUrl} 
-                            alt={item.name}
                             onClick={() => navigate(`/product/${item.productId}`)}
+                            alt={item.name}
+                            onError={(e) => {
+                              e.target.src = '/placeholder-image.jpg'; // Fallback image
+                            }}
                           />
                         </div>
                         

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Menu, ShoppingCart, Search, User, X, ChevronRight, Star, Truck, Shield, RotateCcw } from "lucide-react";
 import "../styles/home.css";
-const host = window.location.hostname;
-const backendPort = 8081;
+import { BASE_URL } from "../util/config.js";
+
 export default function HomePage() {
   const [categories, setCategories] = useState([]);
   const [ads, setAds] = useState([]);
@@ -43,7 +43,7 @@ export default function HomePage() {
       if (!token) return;
 
       const authHeader = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.get(`http://${host}:${backendPort}/home-ads`, authHeader);
+      const res = await axios.get(`${BASE_URL}/home-ads`, authHeader);
 
       const formattedAds = (res.data || []).map((a) => ({
         ...a,
@@ -66,7 +66,7 @@ export default function HomePage() {
       }
       const authHeader = { headers: { Authorization: `Bearer ${token}` } };
 
-      const category = await axios.get(`http://${host}:${backendPort}/categories`, authHeader);
+      const category = await axios.get(`${BASE_URL}/categories`, authHeader);
 
       const rawCategories = Array.isArray(category.data) ? category.data : [category.data];
       const categoryFormatted = rawCategories.map((c) => ({
@@ -87,7 +87,7 @@ export default function HomePage() {
       const userId = localStorage.getItem("userId");
       if (!token || !userId) return;
       const authHeader = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.get(`http://${host}:${backendPort}/cart/count/${userId}`, authHeader);
+      const res = await axios.get(`${BASE_URL}/cart/count/${userId}`, authHeader);
       setCartCount(res.data || 0);
     } catch (error) {
       console.error("Error fetching cart count", error);

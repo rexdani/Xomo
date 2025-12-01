@@ -16,9 +16,8 @@ import {
   Plus
 } from "lucide-react";
 import "../styles/ProfilePage.css";
+import { BASE_URL } from "../util/config.js";
 
-const host = window.location.hostname;
-const backendPort = 8081;
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -48,7 +47,7 @@ export default function ProfilePage() {
       const authHeader = { headers: { Authorization: `Bearer ${token}` } };
 
       const userRes = await axios.get(
-        `http://${host}:${backendPort}/user/profile`,
+        `${BASE_URL}/user/profile`,
         authHeader
       );
 
@@ -76,7 +75,7 @@ export default function ProfilePage() {
       // Orders
       try {
         const ordersRes = await axios.get(
-          `http://${host}:${backendPort}/users/${u.id}/orders`,
+          `${BASE_URL}/users/${u.id}/orders`,
           authHeader
         );
         setOrders(Array.isArray(ordersRes.data) ? ordersRes.data.slice(0, 5) : []);
@@ -87,7 +86,7 @@ export default function ProfilePage() {
       // Wishlist
       try {
         const wishlistRes = await axios.get(
-          `http://${host}:${backendPort}/users/${u.id}/wishlist`,
+          `${BASE_URL}/users/${u.id}/wishlist`,
           authHeader
         );
         setWishlist(Array.isArray(wishlistRes.data) ? wishlistRes.data : []);
@@ -117,7 +116,7 @@ export default function ProfilePage() {
       };
 
       await axios.put(
-        `http://${host}:${backendPort}/user/profile`,
+        `${BASE_URL}/user/profile`,
         updatePayload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
