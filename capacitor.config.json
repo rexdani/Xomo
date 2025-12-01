@@ -1,6 +1,6 @@
 {
   "appId": "com.xomo.app",
-  "appName": "XomoApp",
+  "appName": "xomo-app",
   "webDir": "dist",
   "bundledWebRuntime": false
 }
