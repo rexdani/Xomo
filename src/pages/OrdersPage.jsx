@@ -323,7 +323,7 @@ export default function OrdersPage() {
                     <div className="info-content">
                       <div className="info-label">Delivery Address</div>
                       <div className="info-value">
-                        {order.shippingAddress?.street || "Address not specified"}
+                        {order.address?.street || "Address not specified"}
                       </div>
                     </div>
                   </div>

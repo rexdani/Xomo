@@ -111,51 +111,86 @@ export default function CheckoutPage() {
     return dates;
   };
 
-  // Razorpay Payment
-  const startPayment = async () => {
-    if (paymentMode !== "RAZORPAY") {
-      alert("Please select Razorpay Online Payment");
-      return;
-    }
+ // Razorpay Payment
+const startPayment = async () => {
+  if (paymentMode !== "RAZORPAY") {
+    alert("Please select Razorpay Online Payment");
+    return;
+  }
 
-    try {
-      const orderRes = await axios.post(
-        `${BASE_URL}/payments/create-order`,
-        { amount: total }, authHeader()  
-      );
+  try {
+    // 1. Create Razorpay Order from backend
+    const orderRes = await axios.post(
+      `${BASE_URL}/payments/create-order`,
+      { amount: total },
+      authHeader()
+    );
 
-      const order = orderRes.data;
+    const order = orderRes.data;
 
-      const options = {
-        key: "rzp_test_RmEi7bwQyWNCUh",
-        amount: order.amount,
-        currency: "INR",
-        name: "Clothing Store",
-        description: "Order Payment",
-        order_id: order.id,
-        handler: function (response) {
+    // 2. Razorpay options
+    const options = {
+      key: "rzp_test_RmEi7bwQyWNCUh",
+      amount: order.amount,
+      currency: "INR",
+      name: "Clothing Store",
+      description: "Order Payment",
+      order_id: order.id,
+
+      // 3. Payment Success Handler
+      handler: async function (response) {
+        try {
+          // Build order payload
+          const payload = {
+            userId,
+            addressId: selectedAddress,
+            deliveryDate,
+            paymentMode,
+            items: cart.map(i => ({
+              productId: i.productId,
+              quantity: i.quantity
+            }))
+          };
+
+          // 4. Final order placement to backend
+          await axios.post(
+            `${BASE_URL}/orders/place`,
+            payload,
+            authHeader()
+          );
+
           alert("Payment Successful!");
           navigate("/order-success");
-        },
-        prefill: {
-          name: localStorage.getItem("userName"),
-          email: localStorage.getItem("email"),
-          contact: localStorage.getItem("phone")
-        },
-        theme: { color: "#3861fb" }
-      };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+        } catch (error) {
+          console.error("Order placement failed after payment:", error);
+          alert("Payment succeeded, but order placement failed!");
+        }
+      },
 
-      rzp.on("payment.failed", function () {
-        alert("Payment Failed");
-        navigate("/payment-failed");
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
+      prefill: {
+        name: localStorage.getItem("userName"),
+        email: localStorage.getItem("email"),
+        contact: localStorage.getItem("phone")
+      },
+
+      theme: { color: "#3861fb" }
+    };
+
+    // 5. Open Razorpay window
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+
+    rzp.on("payment.failed", function () {
+      alert("Payment Failed");
+      navigate("/payment-failed");
+    });
+
+  } catch (err) {
+    console.error("Error starting payment:", err);
+    alert("Failed to start payment");
+  }
+};
 
   const placeOrder = async () => {
     if (!selectedAddress) return alert("Select a delivery address");

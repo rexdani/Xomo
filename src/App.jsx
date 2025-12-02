@@ -9,6 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import CheckoutPage  from "./pages/CheckoutPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import OrdersPage from "./pages/OrdersPage";
+import AddressBook from "./pages/addressbook";
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/order-success" element={<OrderSuccessPage />} />
         <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/address" element={<AddressBook/>}/>
 
 
       </Routes>

@@ -96,7 +96,7 @@ export default function ProfilePage() {
 
     } catch (error) {
       console.error("Error loading profile:", error);
-      navigate("/login");
+      navigate("/");
     } finally {
       setLoading(false);
     }
@@ -180,7 +180,7 @@ export default function ProfilePage() {
     return (
       <div className="profile-error">
         <h2>Profile Not Found</h2>
-        <button className="btn primary" onClick={() => navigate("/login")}>
+        <button className="btn primary" onClick={() => navigate("/")}>
           Sign In Again
         </button>
       </div>
@@ -327,9 +327,15 @@ export default function ProfilePage() {
               )}
 
               {/* OTHER TABS */}
-              {activeTab === "orders" && <div className="tab-content">Orders coming…</div>}
+             {activeTab === "orders" && (() => { 
+  navigate("/orders"); 
+  return null; 
+})()}
               {activeTab === "wishlist" && <div className="tab-content">Wishlist coming…</div>}
-              {activeTab === "address" && <div className="tab-content">Address coming…</div>}
+              {activeTab === "address" && (() => { 
+  navigate("/address"); 
+  return null; 
+})()}
               {activeTab === "security" && <div className="tab-content">Security coming…</div>}
 
             </main>
