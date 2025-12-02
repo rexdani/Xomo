@@ -333,73 +333,73 @@ export default function HomePage() {
       </section>
       {/* ENHANCED CATEGORIES SECTION */}
       <main className="main-content">
-        <section className="categories-section">
-          <div className="section-header">
-            <h2 className="section-title">Shop by Category</h2><br></br>
-            <p className="section-subtitle">Discover our carefully curated collections</p>
-            <a href="/categories" className="section-link">
-              View All Categories
-              <ChevronRight size={16} />
-            </a>
-          </div>
+  <section className="categories-section">
+    <div className="section-header">
+      <h2 className="section-title">Shop by Category</h2>
+      <p className="section-subtitle">Discover our carefully curated collections</p>
+      <a href="/categories" className="section-link">
+        View All Categories
+        <ChevronRight size={16} />
+      </a>
+    </div>
 
-          <div className="category-grid">
-            {categories.map((cat, index) => (
-              <a 
-                key={cat.id} 
-                className="category-card" 
-                href={`/category/${cat.id}`}
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="cat-media">
-                  <img src={cat.imageUrl} alt={cat.name} />
-                  <div className="cat-overlay">
-                    <span className="cat-explore">
-                      Explore
-                      <ChevronRight size={16} />
-                    </span>
-                  </div>
-                </div>
-                <div className="cat-info">
-                  <div className="cat-name">{cat.name}</div>
-                  <div className="cat-products">{cat.productCount || 'Various'} products</div>
-                </div>
-              </a>
-            ))}
+    <div className="category-grid-round">
+      {categories.map((cat, index) => (
+        <a 
+          key={cat.id} 
+          className="category-card-round" 
+          href={`/category/${cat.id}`}
+          style={{ animationDelay: `${index * 0.1}s` }}
+        >
+          <div className="cat-media-round">
+            <img src={cat.imageUrl} alt={cat.name} />
+            <div className="cat-overlay-round">
+              <span className="cat-explore-round">
+                Explore
+                <ChevronRight size={16} />
+              </span>
+            </div>
           </div>
-        </section>
+          <div className="cat-info-round">
+            <div className="cat-name-round">{cat.name}</div>
+            <div className="cat-products-round">{cat.productCount || 'Various'} products</div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
 
-        {/* NEW FEATURED PRODUCTS SECTION */}
-        <section className="featured-section">
-          <div className="section-header">
-            <h2 className="section-title">New Arrivals</h2>
-            <p className="section-subtitle">Fresh styles for the season</p>
-          </div>
-          <div className="placeholder-products">
-            <div className="product-placeholder">
-              <div className="product-image"></div>
-              <div className="product-info">
-                <div className="product-name">Premium T-Shirt</div>
-                <div className="product-price">₹1,999</div>
-              </div>
-            </div>
-            <div className="product-placeholder">
-              <div className="product-image"></div>
-              <div className="product-info">
-                <div className="product-name">Designer Jeans</div>
-                <div className="product-price">₹3,499</div>
-              </div>
-            </div>
-            <div className="product-placeholder">
-              <div className="product-image"></div>
-              <div className="product-info">
-                <div className="product-name">Classic Blazer</div>
-                <div className="product-price">₹5,999</div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
+  {/* NEW FEATURED PRODUCTS SECTION */}
+  <section className="featured-section">
+    <div className="section-header">
+      <h2 className="section-title">New Arrivals</h2>
+      <p className="section-subtitle">Fresh styles for the season</p>
+    </div>
+    <div className="product-grid-round">
+      <div className="product-card-round">
+        <div className="product-image-round"></div>
+        <div className="product-info-round">
+          <div className="product-name-round">Premium T-Shirt</div>
+          <div className="product-price-round">₹1,999</div>
+        </div>
+      </div>
+      <div className="product-card-round">
+        <div className="product-image-round"></div>
+        <div className="product-info-round">
+          <div className="product-name-round">Designer Jeans</div>
+          <div className="product-price-round">₹3,499</div>
+        </div>
+      </div>
+      <div className="product-card-round">
+        <div className="product-image-round"></div>
+        <div className="product-info-round">
+          <div className="product-name-round">Classic Blazer</div>
+          <div className="product-price-round">₹5,999</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
 
       {/* ENHANCED FOOTER */}
       <footer className="site-footer">

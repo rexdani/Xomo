@@ -13,10 +13,12 @@ import {
   Heart,
   LogOut,
   Shield,
-  Plus
+  Plus,
+  ArrowLeft
 } from "lucide-react";
 import "../styles/ProfilePage.css";
 import { BASE_URL } from "../util/config.js";
+
 
 
 export default function ProfilePage() {
@@ -32,6 +34,15 @@ export default function ProfilePage() {
   useEffect(() => {
     loadUserProfile();
   }, []);
+  useEffect(() => {
+  if (activeTab === "orders") {
+    navigate("/orders");
+  }
+  if (activeTab === "address") {
+    navigate("/address");
+  }
+}, [activeTab, navigate]);
+
 
   // ---------------- LOAD PROFILE ----------------
   const loadUserProfile = async () => {
@@ -189,8 +200,19 @@ export default function ProfilePage() {
 
   // ---------------- UI ----------------
   return (
-    <div className="profile-page">
+    <div>
+      
+
+      <div className="profile-page">
       <header className="profile-header">
+        
+        <div className="container">
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={18} />
+            Back
+          </button>
+        </div>
+    
         <div className="container">
           <h1 className="page-title">My Account</h1>
           <p className="page-subtitle">Manage your profile and preferences</p>
@@ -327,15 +349,9 @@ export default function ProfilePage() {
               )}
 
               {/* OTHER TABS */}
-             {activeTab === "orders" && (() => { 
-  navigate("/orders"); 
-  return null; 
-})()}
+             
               {activeTab === "wishlist" && <div className="tab-content">Wishlist coming…</div>}
-              {activeTab === "address" && (() => { 
-  navigate("/address"); 
-  return null; 
-})()}
+              
               {activeTab === "security" && <div className="tab-content">Security coming…</div>}
 
             </main>
@@ -343,6 +359,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

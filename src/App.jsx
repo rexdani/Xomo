@@ -10,6 +10,10 @@ import CheckoutPage  from "./pages/CheckoutPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import OrdersPage from "./pages/OrdersPage";
 import AddressBook from "./pages/addressbook";
+import CategoriesPage from "./pages/CategoriesPage";
+import NewArrivalsPage from "./pages/NewArrivalsPage";
+import CollectionsPage from "./pages/CollectionsPage";
+import ContactPage from "./pages/ContactPage";
 
 
 function App() {
@@ -28,6 +32,11 @@ function App() {
         <Route path="/order-success" element={<OrderSuccessPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/address" element={<AddressBook/>}/>
+        <Route path="/categories" element={<CategoriesPage/>}/>
+        <Route path="/new-arrivals" element={<NewArrivalsPage/>}/>
+        <Route path="/collections" element={<CollectionsPage/>}/>
+        <Route path="/contact" element={<ContactPage/>}/>
+
 
 
       </Routes>

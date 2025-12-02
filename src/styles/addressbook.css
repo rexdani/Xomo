@@ -1,16 +1,26 @@
+/* -------- Address Page -------- */
 .address-page {
   padding: 20px;
+  background: #ececec; /* first-color */
+  min-height: 100vh;
 }
 
 .address-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 15px;
 }
 
+.address-header h2 {
+  color: #142d4c; /* fourth-color */
+  font-weight: 600;
+}
+
+/* -------- Add Button -------- */
 .add-btn {
-  background: #142d4c;
-  color: white;
+  background: #142d4c; /* fourth-color */
+  color: #ffffff;
   border: none;
   padding: 10px 14px;
   border-radius: 6px;
@@ -18,66 +28,186 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
+.add-btn:hover {
+  background: #385170; /* third-color */
+}
+
+/* -------- Address List -------- */
 .address-list {
   margin-top: 20px;
   display: grid;
   gap: 15px;
 }
 
+/* -------- Address Card -------- */
 .address-card {
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 10px;
+  padding: 18px;
+  background: #ffffff;
+  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   border: 1px solid #dcdcdc;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
 }
 
 .address-info {
   display: flex;
-  gap: 12px;
+  gap: 15px;
+}
+
+.address-info h3 {
+  color: #142d4c;
+  margin-bottom: 4px;
+}
+
+.address-info p {
+  margin: 2px 0;
+  color: #385170; /* third-color */
+  font-size: 0.9rem;
+}
+
+/* -------- Action Buttons -------- */
+.address-actions {
+  display: flex;
+  align-items: center;
 }
 
 .address-actions button {
   background: none;
   border: none;
   cursor: pointer;
-  margin-left: 10px;
+  margin-left: 12px;
+  transition: 0.2s ease;
 }
 
 .edit-btn {
-  color: #385170;
+  color: #385170; /* third-color */
+}
+
+.edit-btn:hover {
+  color: #142d4c; /* fourth-color */
 }
 
 .delete-btn {
-  color: red;
+  color: #d11a2a;
 }
 
+.delete-btn:hover {
+  color: #900c18;
+}
+
+/* -------- Modal -------- */
 .address-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.45);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 }
 
 .modal-content {
-  background: white;
+  background: #ffffff;
   padding: 25px;
-  border-radius: 10px;
+  border-radius: 12px;
   width: 350px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.modal-content h3 {
+  color: #142d4c;
+  margin-bottom: 10px;
+}
+
+.modal-content input {
+  border: 1px solid #c6c6c6;
+  padding: 10px;
+  border-radius: 6px;
+  outline: none;
+  font-size: 0.95rem;
+  transition: border 0.2s ease;
+}
+
+.modal-content input:focus {
+  border-color: #385170;
 }
 
 .modal-actions {
   display: flex;
   justify-content: space-between;
+  margin-top: 10px;
+}
+
+.save-btn {
+  background: #385170;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.save-btn:hover {
+  background: #142d4c;
+}
+
+.cancel-btn {
+  background: #dcdcdc;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: #bfbfbf;
+}
+
+/* -------- Header (Back Button Section) -------- */
+.products-header {
+  background: linear-gradient(135deg, #ececec 0%, #ffffff 100%);
+  padding: 10px 0 0 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 ;
+  padding: 0 1.5rem;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #385170; /* third-color */
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.back-btn:hover {
+  background: #ececec;
+  border-color: #385170;
+  color: #142d4c;
+  transform: translateY(-1px);
 }
