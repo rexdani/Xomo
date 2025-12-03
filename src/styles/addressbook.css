@@ -1,8 +1,15 @@
+/* -------- Address Book Page Wrapper -------- */
+.addressbook-page {
+  min-height: 100vh;
+  background: #ececec;
+  padding-top: 80px;
+}
+
 /* -------- Address Page -------- */
 .address-page {
   padding: 20px;
   background: #ececec; /* first-color */
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
 }
 
 .address-header {

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, ShoppingCart, Heart, Star, Grid, List } from "lucide-react";
+import Header from "../components/Header";
 import "../styles/categoryProducts.css";
 import { BASE_URL } from "../util/config.js";
 
@@ -110,23 +111,25 @@ export default function CategoryProducts() {
   const sortedProducts = sortProducts(products);
 
   return (
-    <div className="category-products-page">
-      {/* Header */}
-      <header className="products-header">
-        <div className="container">
-          <button className="back-btn" onClick={() => navigate(-1)}>
-            <ArrowLeft size={18} />
-            Back
-          </button>
-          
-          <div className="header-content">
-            <h1 className="page-title">{categoryName}</h1>
-            <p className="page-subtitle">
-              {products.length} product{products.length !== 1 ? 's' : ''} available
-            </p>
+    <>
+      <Header />
+      <div className="category-products-page">
+        {/* Page Title Header */}
+        <div className="products-header">
+          <div className="container">
+            <button className="back-btn" onClick={() => navigate(-1)}>
+              <ArrowLeft size={18} />
+              Back
+            </button>
+            
+            <div className="header-content">
+              <h1 className="page-title">{categoryName}</h1>
+              <p className="page-subtitle">
+                {products.length} product{products.length !== 1 ? 's' : ''} available
+              </p>
+            </div>
           </div>
         </div>
-      </header>
 
       {/* Filters and Controls */}
       <section className="controls-section">
@@ -242,6 +245,7 @@ export default function CategoryProducts() {
           )}
         </div>
       </main>
-    </div>
+      </div>
+    </>
   );
 }

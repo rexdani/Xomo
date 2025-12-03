@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Mail, Lock, User, Phone, MapPin, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, Phone, MapPin, ArrowRight, Eye, EyeOff, Sparkles } from "lucide-react";
 import "../styles/register.css";
+import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
 export default function RegisterPage() {
   const [user, setUser] = useState({
@@ -93,99 +94,109 @@ const host = window.location.hostname;
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-background">
-        <div className="auth-gradient"></div>
+    <div className="auth-page-pro">
+      <div className="auth-background-pro">
+        <div className="bg-blob-pro blob-1"></div>
+        <div className="bg-blob-pro blob-2"></div>
+        <div className="bg-blob-pro blob-3"></div>
       </div>
       
-      <div className="auth-card">
-        <div className="auth-header">
-          <div className="brand-logo">XOMO</div>
-          <h1 className="auth-title">Create Account</h1>
-          <p className="auth-subtitle">Join XOMO for exclusive benefits</p>
+      <div className="auth-card-pro">
+        <div className="auth-header-pro">
+          <div className="brand-logo-pro">
+            <span className="logo-text-pro">XOMO</span>
+            <span className="logo-accent-pro"></span>
+          </div>
+          <h1 className="auth-title-pro">Create Account</h1>
+          <p className="auth-subtitle-pro">Join XOMO for exclusive benefits</p>
           
-          <div className="step-indicator">
-            <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>
-              <span>1</span>
-              <div className="step-label">Personal</div>
+          <div className="step-indicator-pro">
+            <div className={`step-pro ${currentStep >= 1 ? 'active' : ''}`}>
+              <div className="step-number-pro">
+                <span>1</span>
+              </div>
+              <div className="step-label-pro">Personal</div>
             </div>
-            <div className="step-line"></div>
-            <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>
-              <span>2</span>
-              <div className="step-label">Address</div>
+            <div className="step-line-pro"></div>
+            <div className={`step-pro ${currentStep >= 2 ? 'active' : ''}`}>
+              <div className="step-number-pro">
+                <span>2</span>
+              </div>
+              <div className="step-label-pro">Address</div>
             </div>
           </div>
         </div>
 
-        <div className="auth-form">
+        <div className="auth-form-pro">
           {currentStep === 1 && (
             <>
-              <div className="input-group">
-                <div className="input-wrapper">
-                  <User className="input-icon" size={20} />
+              <div className="input-group-pro">
+                <div className="input-wrapper-pro">
+                  <User className="input-icon-pro" size={20} />
                   <input
                     type="text"
                     name="fullName"
                     placeholder="Full Name"
                     onChange={handleChange}
                     onKeyPress={handleKeyPress}
-                    className="auth-input"
+                    className="auth-input-pro"
                   />
                 </div>
               </div>
 
-              <div className="input-group">
-                <div className="input-wrapper">
-                  <Mail className="input-icon" size={20} />
+              <div className="input-group-pro">
+                <div className="input-wrapper-pro">
+                  <Mail className="input-icon-pro" size={20} />
                   <input
                     type="email"
                     name="email"
                     placeholder="Email address"
                     onChange={handleChange}
                     onKeyPress={handleKeyPress}
-                    className="auth-input"
+                    className="auth-input-pro"
                   />
                 </div>
               </div>
 
-              <div className="input-group">
-                <div className="input-wrapper">
-                  <Lock className="input-icon" size={20} />
+              <div className="input-group-pro">
+                <div className="input-wrapper-pro">
+                  <Lock className="input-icon-pro" size={20} />
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Password"
                     onChange={handleChange}
                     onKeyPress={handleKeyPress}
-                    className="auth-input"
+                    className="auth-input-pro"
                   />
                   <button 
                     type="button"
-                    className="password-toggle"
+                    className="password-toggle-pro"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label="Toggle password visibility"
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
-                <div className="input-hint">Minimum 6 characters</div>
+                <div className="input-hint-pro">Minimum 6 characters</div>
               </div>
 
-              <div className="input-group">
-                <div className="input-wrapper">
-                  <Phone className="input-icon" size={20} />
+              <div className="input-group-pro">
+                <div className="input-wrapper-pro">
+                  <Phone className="input-icon-pro" size={20} />
                   <input
                     type="text"
                     name="phone"
                     placeholder="Phone Number"
                     onChange={handleChange}
                     onKeyPress={handleKeyPress}
-                    className="auth-input"
+                    className="auth-input-pro"
                   />
                 </div>
               </div>
 
-              <button className="auth-btn primary" onClick={nextStep}>
-                Continue
+              <button className="auth-btn-pro primary-pro" onClick={nextStep}>
+                <span>Continue</span>
                 <ArrowRight size={18} />
               </button>
             </>
@@ -193,84 +204,86 @@ const host = window.location.hostname;
 
           {currentStep === 2 && (
             <>
-              <div className="address-section">
-                <div className="section-header">
-                  <MapPin className="section-icon" size={20} />
-                  <h3>Shipping Address</h3>
+              <div className="address-section-pro">
+                <div className="section-header-pro">
+                  <div className="section-icon-wrapper-pro">
+                    <MapPin className="section-icon-pro" size={20} />
+                  </div>
+                  <h3 className="section-title-pro">Shipping Address</h3>
                 </div>
 
-                <div className="input-group">
+                <div className="input-group-pro">
                   <input
                     type="text"
                     name="street"
                     placeholder="Street Address"
                     onChange={handleChange}
                     onKeyPress={handleKeyPress}
-                    className="auth-input"
+                    className="auth-input-pro"
                   />
                 </div>
 
-                <div className="form-row">
-                  <div className="input-group">
+                <div className="form-row-pro">
+                  <div className="input-group-pro">
                     <input
                       type="text"
                       name="city"
                       placeholder="City"
                       onChange={handleChange}
                       onKeyPress={handleKeyPress}
-                      className="auth-input"
+                      className="auth-input-pro"
                     />
                   </div>
-                  <div className="input-group">
+                  <div className="input-group-pro">
                     <input
                       type="text"
                       name="state"
                       placeholder="State"
                       onChange={handleChange}
                       onKeyPress={handleKeyPress}
-                      className="auth-input"
+                      className="auth-input-pro"
                     />
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="input-group">
+                <div className="form-row-pro">
+                  <div className="input-group-pro">
                     <input
                       type="text"
                       name="country"
                       placeholder="Country"
                       onChange={handleChange}
                       onKeyPress={handleKeyPress}
-                      className="auth-input"
+                      className="auth-input-pro"
                     />
                   </div>
-                  <div className="input-group">
+                  <div className="input-group-pro">
                     <input
                       type="text"
                       name="postalCode"
                       placeholder="Postal Code"
                       onChange={handleChange}
                       onKeyPress={handleKeyPress}
-                      className="auth-input"
+                      className="auth-input-pro"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="form-actions">
-                <button className="auth-btn secondary" onClick={prevStep}>
+              <div className="form-actions-pro">
+                <button className="auth-btn-pro secondary-pro" onClick={prevStep}>
                   Back
                 </button>
                 <button 
-                  className={`auth-btn primary ${isLoading ? 'loading' : ''}`}
+                  className={`auth-btn-pro primary-pro ${isLoading ? 'loading' : ''}`}
                   onClick={registerUser}
                   disabled={isLoading}
                 >
                   {isLoading ? (
-                    <div className="spinner"></div>
+                    <div className="shared-spinner shared-spinner-small"></div>
                   ) : (
                     <>
-                      Create Account
+                      <span>Create Account</span>
                       <ArrowRight size={18} />
                     </>
                   )}
@@ -280,10 +293,10 @@ const host = window.location.hostname;
           )}
         </div>
 
-        <div className="auth-footer">
+        <div className="auth-footer-pro">
           <p>
             Already have an account?{" "}
-            <a href="/" className="auth-link">Sign in</a>
+            <a href="/" className="auth-link-pro">Sign in</a>
           </p>
         </div>
       </div>

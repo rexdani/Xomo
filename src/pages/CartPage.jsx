@@ -13,7 +13,9 @@ import {
   ShieldCheck,
   RotateCcw
 } from "lucide-react";
+import Header from "../components/Header";
 import "../styles/cart.css";
+import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
 
 export default function CartPage() {
@@ -185,108 +187,120 @@ const formatted = items.map((it) => {
 
   if (isLoading) {
     return (
-      <div className="cart-loading">
-        <div className="loading-spinner"></div>
+      <div className="shared-loading">
+        <div className="shared-spinner"></div>
         <p>Loading your cart...</p>
       </div>
     );
   }
 
   return (
-    <div className="cart-page">
-      {/* Header */}
-      <header className="cart-header">
-        <div className="container">
-          <button className="back-btn" onClick={() => navigate(-1)}>
-            <ArrowLeft size={20} />
-            Continue Shopping
-          </button>
-          
-          <div className="header-content">
-            <h1 className="page-title">Shopping Cart</h1>
-            <p className="page-subtitle">
-              {items.length} item{items.length !== 1 ? 's' : ''} in your cart
-            </p>
-          </div>
-        </div>
-      </header>
-
-      {items.length === 0 ? (
-        <div className="cart-empty-state">
-          <div className="empty-content">
-            <XCircle size={80} className="empty-icon" />
-            <h2>Your cart is empty</h2>
-            <p>Discover our premium collection and find something you love</p>
-            <div className="empty-actions">
-              <button className="btn primary" onClick={() => navigate('/')}>
-                Start Shopping
-              </button>
-              <button className="btn secondary" onClick={() => navigate('/categories')}>
-                Browse Categories
-              </button>
+    <>
+      <Header />
+      <div className="cart-page-pro">
+        {/* Page Title Section */}
+        <div className="cart-header-pro">
+          <div className="shared-container">
+            <button className="back-btn-pro" onClick={() => navigate(-1)}>
+              <ArrowLeft size={20} />
+              <span>Continue Shopping</span>
+            </button>
+            
+            <div className="header-content-pro">
+              <h1 className="page-title-pro">Shopping Cart</h1>
+              <p className="page-subtitle-pro">
+                {items.length} item{items.length !== 1 ? 's' : ''} in your cart
+              </p>
             </div>
           </div>
         </div>
+
+      {items.length === 0 ? (
+        <div className="shared-empty">
+          <XCircle size={80} className="shared-empty-icon" />
+          <h2 className="shared-empty-title">Your cart is empty</h2>
+          <p className="shared-empty-message">Discover our premium collection and find something you love</p>
+          <div className="empty-actions-pro">
+            <button className="shared-btn shared-btn-primary" onClick={() => navigate('/')}>
+              Start Shopping
+            </button>
+            <button className="shared-btn shared-btn-secondary" onClick={() => navigate('/categories')}>
+              Browse Categories
+            </button>
+          </div>
+        </div>
       ) : (
-        <div className="cart-content">
-          <div className="container">
-            <div className="cart-layout">
-              {/* Cart Items */}
-              <main className="cart-main">
-                <div className="cart-items-section">
-                  <div className="section-header">
-                    <h2>Cart Items</h2>
-                    <span className="items-count">{items.length} items</span>
+        <div className="cart-content-pro">
+          <div className="shared-container">
+            <div className="cart-layout-pro">
+              {/* Professional Cart Items */}
+              <main className="cart-main-pro">
+                <div className="cart-items-section-pro">
+                  <div className="section-header-pro">
+                    <h2 className="section-title-pro">Cart Items</h2>
+                    <span className="items-count-pro">{items.length} items</span>
                   </div>
                   
-                  <div className="cart-items">
-                    {items.map((item) => (
-                      <div className="cart-item" key={item.id}>
-                        <div className="item-image">
-                          {/* Fixed: Use the pre-loaded imageUrl */}
+                  <div className="cart-items-pro">
+                    {items.map((item, index) => (
+                      <div 
+                        className="cart-item-pro" 
+                        key={item.id}
+                        style={{ '--delay': `${index * 0.1}s` }}
+                      >
+                        <div className="item-image-pro">
                           <img 
                             src={item.imageUrl} 
                             onClick={() => navigate(`/product/${item.productId}`)}
                             alt={item.name}
                             onError={(e) => {
-                              e.target.src = '/placeholder-image.jpg'; // Fallback image
+                              e.target.src = '/placeholder-image.jpg';
                             }}
                           />
+                          <div className="image-overlay-pro"></div>
                         </div>
                         
-                        <div className="item-details">
-                          <h3 className="item-name" onClick={() => navigate(`/product/${item.productId}`)}>
+                        <div className="item-details-pro">
+                          <h3 
+                            className="item-name-pro" 
+                            onClick={() => navigate(`/product/${item.productId}`)}
+                          >
                             {item.name}
                           </h3>
                           
-                          <div className="item-price">₹{item.price?.toLocaleString()}</div>
+                          <div className="item-price-pro">₹{item.price?.toLocaleString()}</div>
                           
-                          <div className="item-actions">
-                            <button 
-                              className="remove-btn"
-                              onClick={() => removeItem(item.id)}
-                            >
-                              <Trash2 size={16} />
-                              Remove
-                            </button>
-                          </div>
+                          <button 
+                            className="remove-btn-pro"
+                            onClick={() => removeItem(item.id)}
+                            aria-label="Remove item"
+                          >
+                            <Trash2 size={18} />
+                            <span>Remove</span>
+                          </button>
                         </div>
                         
-                        <div className="item-controls">
-                          <div className="quantity-selector">
+                        <div className="item-controls-pro">
+                          <div className="quantity-selector-pro">
                             <button 
+                              className="qty-btn"
                               onClick={() => changeQty(item.id, item.qty - 1)}
                               disabled={item.qty <= 1}
+                              aria-label="Decrease quantity"
                             >
-                              <Minus size={16} />
+                              <Minus size={18} />
                             </button>
-                            <span className="quantity">{item.qty}</span>
-                            <button onClick={() => changeQty(item.id, item.qty + 1)}>
-                              <Plus size={16} />
+                            <span className="quantity-pro">{item.qty}</span>
+                            <button 
+                              className="qty-btn"
+                              onClick={() => changeQty(item.id, item.qty + 1)}
+                              aria-label="Increase quantity"
+                            >
+                              <Plus size={18} />
                             </button>
                           </div>
                           
-                          <div className="item-total">
+                          <div className="item-total-pro">
                             ₹{item.totalPrice?.toLocaleString()}
                           </div>
                         </div>
@@ -295,50 +309,56 @@ const formatted = items.map((it) => {
                   </div>
                 </div>
 
-                {/* Features Strip */}
-                <div className="cart-features">
-                  <div className="feature-item">
-                    <Truck size={24} />
-                    <div className="feature-content">
-                      <div className="feature-title">Free Shipping</div>
-                      <div className="feature-desc">On orders over ₹999</div>
+                {/* Professional Features Strip */}
+                <div className="cart-features-pro">
+                  <div className="feature-item-pro">
+                    <div className="feature-icon-pro">
+                      <Truck size={24} />
+                    </div>
+                    <div className="feature-content-pro">
+                      <div className="feature-title-pro">Free Shipping</div>
+                      <div className="feature-desc-pro">On orders over ₹999</div>
                     </div>
                   </div>
                   
-                  <div className="feature-item">
-                    <RotateCcw size={24} />
-                    <div className="feature-content">
-                      <div className="feature-title">Easy Returns</div>
-                      <div className="feature-desc">15 days hassle-free</div>
+                  <div className="feature-item-pro">
+                    <div className="feature-icon-pro">
+                      <RotateCcw size={24} />
+                    </div>
+                    <div className="feature-content-pro">
+                      <div className="feature-title-pro">Easy Returns</div>
+                      <div className="feature-desc-pro">15 days hassle-free</div>
                     </div>
                   </div>
                   
-                  <div className="feature-item">
-                    <ShieldCheck size={24} />
-                    <div className="feature-content">
-                      <div className="feature-title">Secure Payment</div>
-                      <div className="feature-desc">100% protected</div>
+                  <div className="feature-item-pro">
+                    <div className="feature-icon-pro">
+                      <ShieldCheck size={24} />
+                    </div>
+                    <div className="feature-content-pro">
+                      <div className="feature-title-pro">Secure Payment</div>
+                      <div className="feature-desc-pro">100% protected</div>
                     </div>
                   </div>
                 </div>
               </main>
 
-              {/* Order Summary */}
-              <aside className="cart-sidebar">
-                <div className="order-summary">
-                  <h3>Order Summary</h3>
+              {/* Professional Order Summary */}
+              <aside className="cart-sidebar-pro">
+                <div className="order-summary-pro">
+                  <h3 className="summary-title-pro">Order Summary</h3>
                   
-                  <div className="summary-items">
-                    <div className="summary-row">
+                  <div className="summary-items-pro">
+                    <div className="summary-row-pro">
                       <span>Subtotal ({items.length} items)</span>
                       <span>₹{subtotal.toLocaleString()}</span>
                     </div>
                     
-                    <div className="summary-row">
+                    <div className="summary-row-pro">
                       <span>Shipping</span>
                       <span>
                         {shipping === 0 ? (
-                          <span className="free-shipping">FREE</span>
+                          <span className="free-shipping-pro">FREE</span>
                         ) : (
                           `₹${shipping}`
                         )}
@@ -346,23 +366,24 @@ const formatted = items.map((it) => {
                     </div>
                     
                     {discountAmt > 0 && (
-                      <div className="summary-row discount">
+                      <div className="summary-row-pro discount-pro">
                         <span>Discount</span>
-                        <span className="discount-amount">-₹{discountAmt.toLocaleString()}</span>
+                        <span className="discount-amount-pro">-₹{discountAmt.toLocaleString()}</span>
                       </div>
                     )}
                   </div>
 
-                  <div className="coupon-section">
-                    <div className="coupon-input">
+                  <div className="coupon-section-pro">
+                    <div className="coupon-input-pro">
                       <input
                         type="text"
                         placeholder="Enter coupon code"
                         value={coupon}
                         onChange={(e) => setCoupon(e.target.value)}
+                        className="coupon-field-pro"
                       />
                       <button 
-                        className="apply-coupon"
+                        className="apply-coupon-pro"
                         onClick={applyCoupon}
                         disabled={!coupon.trim()}
                       >
@@ -371,33 +392,33 @@ const formatted = items.map((it) => {
                     </div>
                   </div>
 
-                  <div className="summary-total">
-                    <div className="total-row">
+                  <div className="summary-total-pro">
+                    <div className="total-row-pro">
                       <span>Total</span>
-                      <span className="total-amount">₹{total.toLocaleString()}</span>
+                      <span className="total-amount-pro">₹{total.toLocaleString()}</span>
                     </div>
                   </div>
 
                   <button
-                    className="checkout-btn"
+                    className="checkout-btn-pro"
                     onClick={checkout}
                     disabled={processing}
                   >
                     {processing ? (
                       <>
-                        <div className="spinner-small"></div>
+                        <div className="shared-spinner shared-spinner-small"></div>
                         Processing...
                       </>
                     ) : (
                       <>
                         <CreditCard size={20} />
-                        Proceed to Checkout
+                        <span>Proceed to Checkout</span>
                       </>
                     )}
                   </button>
 
-                  <div className="security-note">
-                    <ShieldCheck size={16} />
+                  <div className="security-note-pro">
+                    <ShieldCheck size={18} />
                     <span>Your payment information is secure and encrypted</span>
                   </div>
                 </div>
@@ -406,6 +427,7 @@ const formatted = items.map((it) => {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

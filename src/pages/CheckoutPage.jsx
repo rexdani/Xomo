@@ -13,7 +13,9 @@ import {
   Lock,
   Star
 } from "lucide-react";
+import Header from "../components/Header";
 import "../styles/checkout.css";
+import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
 
 
@@ -242,67 +244,76 @@ const startPayment = async () => {
 
   if (loading) {
     return (
-      <div className="checkout-loading">
-        <div className="loading-spinner"></div>
+      <div className="shared-loading">
+        <div className="shared-spinner"></div>
         <p>Loading checkout...</p>
       </div>
     );
   }
 
   return (
-    <div className="checkout-page">
-      {/* Header */}
-      <header className="checkout-header">
-        <div className="container">
-          <button className="back-btn" onClick={() => navigate(-1)}>
-            <ArrowLeft size={20} /> Back to Cart
+    <>
+      <Header />
+      <div className="checkout-page-pro">
+        {/* Page Title Header */}
+        <div className="checkout-header-pro">
+        <div className="shared-container">
+          <button className="back-btn-pro" onClick={() => navigate(-1)}>
+            <ArrowLeft size={20} />
+            <span>Back to Cart</span>
           </button>
-          <h1 className="page-title">Checkout</h1>
+          <div className="header-content-pro">
+            <h1 className="page-title-pro">Checkout</h1>
+            <p className="page-subtitle-pro">Complete your order securely</p>
+          </div>
         </div>
-      </header>
+      </div>
 
-      <div className="checkout-container">
-        <div className="container">
-          <div className="checkout-content">
-            {/* Left Column */}
-            <div className="checkout-forms">
+      <div className="checkout-container-pro">
+        <div className="shared-container">
+          <div className="checkout-content-pro">
+            {/* Professional Left Column */}
+            <div className="checkout-forms-pro">
               
               {/* Delivery Address */}
-              <section className="checkout-section">
-                <div className="section-header">
-                  <MapPin className="section-icon" size={24} />
+              <section className="checkout-section-pro">
+                <div className="section-header-pro">
+                  <div className="section-icon-wrapper-pro">
+                    <MapPin className="section-icon-pro" size={24} />
+                  </div>
                   <div>
-                    <h2 className="section-title">Delivery Address</h2>
-                    <p className="section-subtitle">
+                    <h2 className="section-title-pro">Delivery Address</h2>
+                    <p className="section-subtitle-pro">
                       Where should we deliver your order?
                     </p>
                   </div>
                 </div>
 
-                <div className="addresses-grid">
-                  {addresses.map(addr => (
+                <div className="addresses-grid-pro">
+                  {addresses.map((addr, index) => (
                     <div
                       key={addr.id}
-                      className={`address-card ${
+                      className={`address-card-pro ${
                         selectedAddress === addr.id ? "selected" : ""
                       }`}
                       onClick={() => setSelectedAddress(addr.id)}
+                      style={{ '--delay': `${index * 0.1}s` }}
                     >
-                      <div className="address-radio">
+                      <div className="address-radio-pro">
                         <div
-                          className={`radio-dot ${
+                          className={`radio-dot-pro ${
                             selectedAddress === addr.id ? "active" : ""
                           }`}
                         ></div>
                       </div>
-                      <div className="address-content">
-                        <h3 className="address-name">{addr.fullName}</h3>
-                        <p className="address-line">{addr.street}</p>
-                        <p className="address-line">
+                      <div className="address-content-pro">
+                        <h3 className="address-name-pro">{addr.fullName}</h3>
+                        <p className="address-line-pro">{addr.street}</p>
+                        <p className="address-line-pro">
                           {addr.city}, {addr.state} - {addr.postalCode}
                         </p>
-                        <p className="address-line">{addr.country}</p>
-                        <p className="address-phone">📱 {addr.phoneNumber}</p>
+                        <p className="address-line-pro">{addr.country}</p>
+                        <p className="address-phone-pro">📱 {addr.phoneNumber}</p>
                       </div>
                     </div>
                   ))}
@@ -311,37 +322,40 @@ const startPayment = async () => {
 
 
               {/* Delivery Date */}
-              <section className="checkout-section">
-                <div className="section-header">
-                  <Calendar className="section-icon" size={24} />
+              <section className="checkout-section-pro">
+                <div className="section-header-pro">
+                  <div className="section-icon-wrapper-pro">
+                    <Calendar className="section-icon-pro" size={24} />
+                  </div>
                   <div>
-                    <h2 className="section-title">Delivery Date</h2>
-                    <p className="section-subtitle">
+                    <h2 className="section-title-pro">Delivery Date</h2>
+                    <p className="section-subtitle-pro">
                       Choose your preferred delivery date
                     </p>
                   </div>
                 </div>
 
-                <div className="delivery-dates">
-                  {getDeliveryDates().map(date => (
+                <div className="delivery-dates-pro">
+                  {getDeliveryDates().map((date, index) => (
                     <div
                       key={date.value}
-                      className={`delivery-option ${
+                      className={`delivery-option-pro ${
                         deliveryDate === date.value ? "selected" : ""
                       } ${date.isExpress ? "express" : ""}`}
                       onClick={() => setDeliveryDate(date.value)}
+                      style={{ '--delay': `${index * 0.05}s` }}
                     >
-                      <div className="date-radio">
+                      <div className="date-radio-pro">
                         <div
-                          className={`radio-dot ${
+                          className={`radio-dot-pro ${
                             deliveryDate === date.value ? "active" : ""
                           }`}
                         ></div>
                       </div>
-                      <div className="date-content">
-                        <span className="date-label">{date.label}</span>
+                      <div className="date-content-pro">
+                        <span className="date-label-pro">{date.label}</span>
                         {date.isExpress && (
-                          <span className="express-badge">Express</span>
+                          <span className="express-badge-pro">Express</span>
                         )}
                       </div>
                     </div>
@@ -350,39 +364,41 @@ const startPayment = async () => {
               </section>
 
               {/* Payment Method */}
-              <section className="checkout-section">
-                <div className="section-header">
-                  <Wallet className="section-icon" size={24} />
+              <section className="checkout-section-pro">
+                <div className="section-header-pro">
+                  <div className="section-icon-wrapper-pro">
+                    <Wallet className="section-icon-pro" size={24} />
+                  </div>
                   <div>
-                    <h2 className="section-title">Payment Method</h2>
-                    <p className="section-subtitle">
+                    <h2 className="section-title-pro">Payment Method</h2>
+                    <p className="section-subtitle-pro">
                       Select a payment method
                     </p>
                   </div>
                 </div>
 
-                <div className="payment-methods">
+                <div className="payment-methods-pro">
                   
                   {/* COD */}
                   <div
-                    className={`payment-option ${
+                    className={`payment-option-pro ${
                       paymentMode === "COD" ? "selected" : ""
                     }`}
                     onClick={() => setPaymentMode("COD")}
                   >
-                    <div className="payment-radio">
+                    <div className="payment-radio-pro">
                       <div
-                        className={`radio-dot ${
+                        className={`radio-dot-pro ${
                           paymentMode === "COD" ? "active" : ""
                         }`}
                       ></div>
                     </div>
-                    <div className="payment-content">
-                      <div className="payment-header">
-                        <h3 className="payment-name">Cash on Delivery</h3>
-                        <div className="payment-icon">💵</div>
+                    <div className="payment-content-pro">
+                      <div className="payment-header-pro">
+                        <h3 className="payment-name-pro">Cash on Delivery</h3>
+                        <div className="payment-icon-pro">💵</div>
                       </div>
-                      <p className="payment-desc">
+                      <p className="payment-desc-pro">
                         Pay when the order is delivered
                       </p>
                     </div>
@@ -390,24 +406,24 @@ const startPayment = async () => {
 
                   {/* Razorpay */}
                   <div
-                    className={`payment-option ${
+                    className={`payment-option-pro ${
                       paymentMode === "RAZORPAY" ? "selected" : ""
                     }`}
                     onClick={() => setPaymentMode("RAZORPAY")}
                   >
-                    <div className="payment-radio">
+                    <div className="payment-radio-pro">
                       <div
-                        className={`radio-dot ${
+                        className={`radio-dot-pro ${
                           paymentMode === "RAZORPAY" ? "active" : ""
                         }`}
                       ></div>
                     </div>
-                    <div className="payment-content">
-                      <div className="payment-header">
-                        <h3 className="payment-name">Online Payment</h3>
-                        <div className="payment-icon">💳</div>
+                    <div className="payment-content-pro">
+                      <div className="payment-header-pro">
+                        <h3 className="payment-name-pro">Online Payment</h3>
+                        <div className="payment-icon-pro">💳</div>
                       </div>
-                      <p className="payment-desc">
+                      <p className="payment-desc-pro">
                         Pay securely using Razorpay
                       </p>
                     </div>
@@ -416,87 +432,106 @@ const startPayment = async () => {
 
                 {/* Razorpay Button */}
                 {paymentMode === "RAZORPAY" && (
-                  <button onClick={startPayment} className="checkout-btn">
-                    Pay with Razorpay
+                  <button onClick={startPayment} className="checkout-btn-pro">
+                    <CreditCard size={20} />
+                    <span>Pay with Razorpay</span>
                   </button>
                 )}
               </section>
             </div>
 
-            {/* Right Column – Summary */}
-            <div className="order-summary">
-              <div className="summary-card">
-                <div className="summary-header">
-                  <CreditCard size={24} />
-                  <h2>Order Summary</h2>
+            {/* Professional Order Summary */}
+            <div className="order-summary-pro">
+              <div className="summary-card-pro">
+                <div className="summary-header-pro">
+                  <div className="summary-icon-pro">
+                    <CreditCard size={24} />
+                  </div>
+                  <h2 className="summary-title-pro">Order Summary</h2>
                 </div>
 
-                <div className="cart-items">
-                  <h3 className="items-title">Items ({cart.length})</h3>
-                  {cart.map(item => (
-                    <div key={item.id} className="cart-item">
-                      <img
-                        src={item.imageUrl}
-                        alt={item.name}
-                        className="item-image"
-                      />
-                      <div className="item-details">
-                        <h4 className="item-name">{item.product.name}</h4>
-                        <p className="item-quantity">Qty: {item.quantity}</p>
+                <div className="cart-items-pro">
+                  <h3 className="items-title-pro">Items ({cart.length})</h3>
+                  <div className="items-list-pro">
+                    {cart.map((item, index) => (
+                      <div 
+                        key={item.id} 
+                        className="cart-item-pro"
+                        style={{ '--delay': `${index * 0.05}s` }}
+                      >
+                        <img
+                          src={item.imageUrl}
+                          alt={item.name}
+                          className="item-image-pro"
+                        />
+                        <div className="item-details-pro">
+                          <h4 className="item-name-pro">{item.product?.name || item.name}</h4>
+                          <p className="item-quantity-pro">Qty: {item.quantity}</p>
+                        </div>
+                        <div className="item-price-pro">
+                          {formatPrice(item.price * item.quantity)}
+                        </div>
                       </div>
-                      <div className="item-price">
-                        {formatPrice(item.price * item.quantity)}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
 
-                <div className="price-breakdown">
-                  <div className="price-row">
+                <div className="price-breakdown-pro">
+                  <div className="price-row-pro">
                     <span>Subtotal</span>
                     <span>{formatPrice(subtotal)}</span>
                   </div>
-                  <div className="price-row">
+                  <div className="price-row-pro">
                     <span>Shipping</span>
-                    <span>{shipping === 0 ? "FREE" : formatPrice(shipping)}</span>
+                    <span>{shipping === 0 ? <span className="free-shipping-pro">FREE</span> : formatPrice(shipping)}</span>
                   </div>
-                  <div className="price-row">
+                  <div className="price-row-pro">
                     <span>Tax</span>
                     <span>{formatPrice(tax)}</span>
                   </div>
-                  <div className="price-divider"></div>
-                  <div className="price-row total">
+                  <div className="price-divider-pro"></div>
+                  <div className="price-row-pro total-pro">
                     <span>Total Amount</span>
-                    <span>{formatPrice(total)}</span>
+                    <span className="total-amount-pro">{formatPrice(total)}</span>
                   </div>
                 </div>
 
-                <div className="security-badge">
-                  <Shield size={16} />
+                <div className="security-badge-pro">
+                  <Shield size={18} />
                   <span>Secure checkout · SSL encrypted</span>
                 </div>
 
                 {/* COD Place Order */}
                 {paymentMode === "COD" && (
                   <button
-                    className="place-order-btn"
+                    className="place-order-btn-pro"
                     onClick={placeOrder}
+                    disabled={placingOrder}
                   >
-                    <Lock size={20} />
-                    Place COD Order · {formatPrice(total)}
+                    {placingOrder ? (
+                      <>
+                        <div className="shared-spinner shared-spinner-small"></div>
+                        <span>Placing Order...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Lock size={20} />
+                        <span>Place COD Order · {formatPrice(total)}</span>
+                      </>
+                    )}
                   </button>
                 )}
 
-                <div className="trust-indicators">
-                  <div className="trust-item">
+                <div className="trust-indicators-pro">
+                  <div className="trust-item-pro">
                     <Truck size={18} />
                     <span>Free shipping over ₹999</span>
                   </div>
-                  <div className="trust-item">
+                  <div className="trust-item-pro">
                     <CheckCircle size={18} />
                     <span>Easy 15-day returns</span>
                   </div>
-                  <div className="trust-item">
+                  <div className="trust-item-pro">
                     <Star size={18} />
                     <span>Premium quality guarantee</span>
                   </div>
@@ -508,6 +543,7 @@ const startPayment = async () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

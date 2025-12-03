@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Mail, Phone, MapPin, Clock, Send, Check, Loader } from "lucide-react";
+import Header from "../components/Header";
 import "../styles/contact.css";
 
 export default function ContactPage() {
@@ -106,8 +107,10 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="contact-page">
-      {/* Hero Section */}
+    <>
+      <Header />
+      <div className="contact-page">
+        {/* Hero Section */}
       <section className="contact-hero">
         <div className="container">
           <div className="hero-content">
@@ -306,6 +309,7 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

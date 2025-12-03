@@ -14,6 +14,7 @@ import {
   Shield
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 import "../styles/orders.css";
 import { BASE_URL } from "../util/config.js";
 
@@ -132,22 +133,24 @@ export default function OrdersPage() {
   const filteredOrders = getFilteredOrders();
 
   return (
-    <div className="orders-page">
-      {/* Header */}
-      <header className="orders-header">
-        <div className="container">
-          <div className="header-content">
-            <button className="back-btn" onClick={() => navigate(-1)}>
-              <ArrowLeft size={20} />
-              Back
-            </button>
-            <div className="header-title">
-              <h1 className="orders-title">My Orders</h1>
-              <p className="orders-subtitle">Track and manage your purchases</p>
+    <>
+      <Header />
+      <div className="orders-page">
+        {/* Page Title Header */}
+        <div className="orders-header">
+          <div className="container">
+            <div className="header-content">
+              <button className="back-btn" onClick={() => navigate(-1)}>
+                <ArrowLeft size={20} />
+                Back
+              </button>
+              <div className="header-title">
+                <h1 className="orders-title">My Orders</h1>
+                <p className="orders-subtitle">Track and manage your purchases</p>
+              </div>
             </div>
           </div>
         </div>
-      </header>
 
       {/* Stats Bar */}
       <div className="stats-bar">
@@ -386,6 +389,7 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

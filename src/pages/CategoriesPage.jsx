@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { ChevronRight, Search, Filter, Grid, List } from "lucide-react";
+import { ChevronRight, Search, Filter, Grid, List, Sparkles, TrendingUp } from "lucide-react";
+import Header from "../components/Header";
 import "../styles/categories.css";
+import "../styles/shared.css";
 
 const host = window.location.hostname;
 const backendPort = 8081;
@@ -167,41 +169,18 @@ export default function CategoriesPage() {
 
   if (loading) {
     return (
-      <div className="categories-loading">
-        <div className="loading-spinner"></div>
+      <div className="shared-loading">
+        <div className="shared-spinner"></div>
         <p>Loading categories...</p>
       </div>
     );
   }
 
   return (
-    <div className="categories-page">
-      {/* Hero Section */}
-      <section className="categories-hero">
-        <div className="container">
-          <div className="hero-content">
-            <h1 className="hero-title">Our Collections</h1>
-            <p className="hero-subtitle">
-              Discover premium fashion categories curated for every style and occasion.
-            </p>
-            
-            <div className="search-container">
-              <div className="search-box">
-                <Search size={20} className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Search categories..."
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className="search-input"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Filters Section */}
+    <>
+      <Header />
+      <div className="categories-page-pro">
+        {/* Filters Section - At Top */}
       <section className="filters-section">
         <div className="container">
           <div className="filters-bar">
@@ -253,70 +232,101 @@ export default function CategoriesPage() {
         </div>
       </section>
 
-      {/* Categories Grid */}
-      <main className="categories-main">
-        <div className="container">
+      {/* Professional Hero Section */}
+      <section className="categories-hero-pro">
+        <div className="shared-container">
+          <div className="hero-content-pro">
+            <div className="hero-badge-pro">
+              <Sparkles size={14} />
+              <span>Collections</span>
+            </div>
+            <h1 className="hero-title-pro">Our Collections</h1>
+            <p className="hero-subtitle-pro">
+              Discover premium fashion categories curated for every style and occasion.
+            </p>
+            
+            <div className="search-container-pro">
+              <div className="search-box-pro">
+                <Search size={20} className="search-icon-pro" />
+                <input
+                  type="text"
+                  placeholder="Search categories..."
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  className="search-input-pro"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Professional Categories Grid - Round Cards */}
+      <main className="categories-main-pro">
+        <div className="shared-container">
           {filteredCategories.length > 0 ? (
-            <div className={`categories-container ${viewMode}`}>
-              {filteredCategories.map((category) => (
-                <div 
-                  key={category.id} 
-                  className="category-card"
-                  onClick={() => window.location.href = `/category/${category.id}`}
+            <div className={`categories-grid-pro ${viewMode}`}>
+              {filteredCategories.map((category, index) => (
+                <a
+                  key={category.id}
+                  href={`/category/${category.id}`}
+                  className="category-card-pro"
+                  style={{ '--delay': `${index * 0.1}s` }}
                 >
-                  <div className="category-media">
+                  <div className="category-image-wrapper-pro">
                     <img 
                       src={category.imageUrl} 
                       alt={category.name}
-                      className="category-image"
+                      className="category-image-pro"
                       onError={(e) => {
                         e.target.src = `/category-placeholder-${Math.floor(Math.random() * 5) + 1}.jpg`;
                       }}
                     />
                     
-                    <div className="category-overlay">
-                      <span className="explore-text">
-                        Explore Collection
-                        <ChevronRight size={16} />
-                      </span>
+                    <div className="category-overlay-pro">
+                      <div className="category-overlay-content-pro">
+                        <span className="explore-text-pro">
+                          Explore
+                          <ChevronRight size={18} />
+                        </span>
+                      </div>
                     </div>
 
+                    <div className="category-shine-pro"></div>
+                    <div className="category-pulse-ring-pro"></div>
+
                     {(category.featured || category.popular) && (
-                      <div className="category-badges">
+                      <div className="category-badges-pro">
                         {category.featured && (
-                          <span className="badge featured">Featured</span>
+                          <span className="badge-pro featured-pro">Featured</span>
                         )}
                         {category.popular && (
-                          <span className="badge popular">Popular</span>
+                          <span className="badge-pro popular-pro">
+                            <TrendingUp size={12} />
+                            Popular
+                          </span>
                         )}
                       </div>
                     )}
                   </div>
 
-                  <div className="category-info">
-                    <h3 className="category-name">{category.name}</h3>
-                    <p className="category-description">{category.description}</p>
-                    
-                    <div className="category-meta">
-                      <span className="product-count">
-                        {category.productCount} products
-                      </span>
-                      <button className="view-category-btn">
-                        View Collection
-                        <ChevronRight size={16} />
-                      </button>
+                  <div className="category-info-pro">
+                    <h3 className="category-name-pro">{category.name}</h3>
+                    <p className="category-description-pro">{category.description}</p>
+                    <div className="category-count-pro">
+                      {category.productCount} products
                     </div>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           ) : (
-            <div className="no-results">
-              <div className="no-results-icon">🔍</div>
-              <h3>No Categories Found</h3>
-              <p>Try adjusting your search or filters</p>
+            <div className="shared-empty">
+              <div className="shared-empty-icon">🔍</div>
+              <h3 className="shared-empty-title">No Categories Found</h3>
+              <p className="shared-empty-message">Try adjusting your search or filters</p>
               <button 
-                className="btn primary"
+                className="shared-btn shared-btn-primary"
                 onClick={() => {
                   setSearchTerm("");
                   setActiveFilter("all");
@@ -366,6 +376,7 @@ export default function CategoriesPage() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

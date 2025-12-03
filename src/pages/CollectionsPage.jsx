@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Star, Clock, Users, ShoppingBag, TrendingUp } from "lucide-react";
+import Header from "../components/Header";
 import "../styles/collections.css";
 
 export default function CollectionsPage() {
@@ -67,8 +68,10 @@ export default function CollectionsPage() {
   });
 
   return (
-    <div className="collections-page">
-      {/* Hero Section */}
+    <>
+      <Header />
+      <div className="collections-page">
+        {/* Hero Section */}
       <section className="collections-hero">
         <div className="container">
           <div className="hero-content">
@@ -289,6 +292,7 @@ export default function CollectionsPage() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

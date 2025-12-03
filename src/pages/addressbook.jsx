@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../util/config.js";
+import Header from "../components/Header";
 import "../styles/addressbook.css";
 import { Edit, Trash2, Plus, MapPin, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -93,14 +94,16 @@ export default function AddressBook() {
 
   return (
     <>
-      <header className="products-header">
-        <div className="container">
-          <button className="back-btn" onClick={() => navigate(-1)}>
-            <ArrowLeft size={18} />
-            Back
-          </button>
+      <Header />
+      <div className="addressbook-page">
+        <div className="products-header">
+          <div className="container">
+            <button className="back-btn" onClick={() => navigate(-1)}>
+              <ArrowLeft size={18} />
+              Back
+            </button>
+          </div>
         </div>
-      </header>
 
       <div className="address-page">
         <div className="address-header">
@@ -205,6 +208,7 @@ export default function AddressBook() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </>
   );

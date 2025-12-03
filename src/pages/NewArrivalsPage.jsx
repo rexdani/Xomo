@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { ShoppingCart, Heart, Star, Clock, TrendingUp, Filter, Grid, List } from "lucide-react";
+import Header from "../components/Header";
 import "../styles/newArrivals.css";
 
 const host = window.location.hostname;
@@ -204,8 +205,10 @@ export default function NewArrivalsPage() {
   }
 
   return (
-    <div className="new-arrivals-page">
-      {/* Hero Section */}
+    <>
+      <Header />
+      <div className="new-arrivals-page">
+        {/* Hero Section */}
       <section className="new-arrivals-hero">
         <div className="container">
           <div className="hero-content">
@@ -471,6 +474,7 @@ export default function NewArrivalsPage() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

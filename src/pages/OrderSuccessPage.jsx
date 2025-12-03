@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { CheckCircle, Truck, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 import "../styles/orderSuccess.css";
 import { BASE_URL } from "../util/config.js";
 
@@ -16,9 +17,11 @@ export default function OrderSuccessPage() {
   }, []);
 
   return (
-    <div className="success-page">
+    <>
+      <Header />
+      <div className="success-page">
 
-      <div className="success-card">
+        <div className="success-card">
 
         {/* Success Icon */}
         <div className="success-icon">
@@ -62,8 +65,9 @@ export default function OrderSuccessPage() {
         <p className="auto-redirect-text">
           Redirecting to your orders in <strong>5 seconds...</strong>
         </p>
-      </div>
+        </div>
 
-    </div>
+      </div>
+    </>
   );
 }

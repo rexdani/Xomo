@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
-import { Menu, ShoppingCart, Search, User, X, ChevronRight, Star, Truck, Shield, RotateCcw } from "lucide-react";
+import { 
+  Menu, ShoppingCart, Search, User, X, ChevronRight, Star, 
+  Truck, Shield, RotateCcw, ChevronLeft, Sparkles, TrendingUp,
+  Award, Heart, ArrowRight, Play
+} from "lucide-react";
 import "../styles/home.css";
 import { BASE_URL } from "../util/config.js";
 
@@ -11,36 +15,156 @@ export default function HomePage() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [visibleSections, setVisibleSections] = useState(new Set());
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const heroRef = useRef(null);
+  const carouselIntervalRef = useRef(null);
+  const parallaxRef = useRef(null);
 
+  // Scroll detection for header and parallax
   useEffect(() => {
-    loadInitialData();
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 50);
+      
+      // Calculate scroll progress
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const progress = (scrollY / (documentHeight - windowHeight)) * 100;
+      setScrollProgress(Math.min(100, Math.max(0, progress)));
+      
+      // Parallax effect for hero background
+      if (parallaxRef.current) {
+        const parallaxElements = parallaxRef.current.querySelectorAll('.parallax-element');
+        parallaxElements.forEach((el, index) => {
+          const speed = 0.5 + (index * 0.1);
+          const yPos = -(scrollY * speed);
+          el.style.transform = `translateY(${yPos}px)`;
+        });
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial call
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Intersection Observer for animations - runs after content is loaded
+  useEffect(() => {
+    if (isLoading) return; // Wait until loading is complete
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            setVisibleSections((prev) => new Set(prev).add(entry.target.id));
+            
+            // Animate counters when stats section is visible
+            if (entry.target.id === 'hero') {
+              const counters = entry.target.querySelectorAll('.stat-number');
+              counters.forEach((counter) => {
+                const target = parseInt(counter.getAttribute('data-count') || '0');
+                animateCounter(counter, target);
+              });
+            }
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -100px 0px' }
+    );
+
+    // Counter animation function
+    const animateCounter = (element, target) => {
+      let current = 0;
+      const increment = target / 50;
+      const duration = 2000;
+      const stepTime = duration / 50;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          element.textContent = target + (target >= 10 ? 'K+' : '+');
+          clearInterval(timer);
+        } else {
+          element.textContent = Math.floor(current) + (target >= 10 ? 'K+' : '+');
+        }
+      }, stepTime);
+    };
+
+    // Use setTimeout to ensure DOM is fully rendered
+    const timeoutId = setTimeout(() => {
+      const sections = document.querySelectorAll('[data-animate]');
+      sections.forEach((section) => observer.observe(section));
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+      const sections = document.querySelectorAll('[data-animate]');
+      sections.forEach((section) => observer.unobserve(section));
+    };
+  }, [isLoading]);
+
+  // Load initial data
+  useEffect(() => {
+    // Set a maximum loading time to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      console.warn("Loading timeout - showing content anyway");
+      setIsLoading(false);
+    }, 10000); // 10 second max loading time
+
+    loadInitialData();
+
+    return () => {
+      clearTimeout(loadingTimeout);
+      if (carouselIntervalRef.current) {
+        clearInterval(carouselIntervalRef.current);
+      }
+    };
+  }, []);
+
+  // Auto-rotate carousel
   useEffect(() => {
     if (ads.length > 1) {
-      const interval = setInterval(() => {
+      carouselIntervalRef.current = setInterval(() => {
         setCurrentAdIndex((prev) => (prev + 1) % ads.length);
-      }, 5000);
-      return () => clearInterval(interval);
+      }, 6000);
+      return () => {
+        if (carouselIntervalRef.current) {
+          clearInterval(carouselIntervalRef.current);
+        }
+      };
     }
   }, [ads.length]);
 
   const loadInitialData = async () => {
     setIsLoading(true);
+    setError(null);
     try {
-      await Promise.all([loadAds(), loadCategories(), loadCartCount()]);
-    } catch (error) {
-      console.error("Error loading initial data", error);
+      // Use Promise.allSettled to ensure all requests complete even if some fail
+      await Promise.allSettled([
+        loadAds(),
+        loadCategories(),
+        loadCartCount()
+      ]);
+    } catch (err) {
+      console.error("Error loading initial data", err);
+      // Don't set error state - allow page to render with empty data
     } finally {
+      // Always set loading to false, even if requests fail
       setIsLoading(false);
     }
   };
 
-  // ------------------- LOAD ADS ------------------- //
   const loadAds = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return;
+      if (!token) {
+        setAds([]); // Set empty array if no token
+        return;
+      }
 
       const authHeader = { headers: { Authorization: `Bearer ${token}` } };
       const res = await axios.get(`${BASE_URL}/home-ads`, authHeader);
@@ -53,15 +177,16 @@ export default function HomePage() {
       setAds(formattedAds);
     } catch (error) {
       console.error("Error loading ads", error);
+      setAds([]); // Set empty array on error
     }
   };
 
-  // ------------------- LOAD CATEGORIES ------------------- //
   const loadCategories = async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         console.error("Token missing! Please login again.");
+        setCategories([]); // Set empty array if no token
         return;
       }
       const authHeader = { headers: { Authorization: `Bearer ${token}` } };
@@ -77,10 +202,10 @@ export default function HomePage() {
       setCategories(categoryFormatted);
     } catch (error) {
       console.error("Error loading categories", error);
+      setCategories([]); // Set empty array on error
     }
   };
 
-  // ------------------- LOAD CART COUNT ------------------- //
   const loadCartCount = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -94,54 +219,98 @@ export default function HomePage() {
     }
   };
 
-  const nextAd = () => {
+  const nextAd = useCallback(() => {
     setCurrentAdIndex((prev) => (prev + 1) % ads.length);
-  };
+    if (carouselIntervalRef.current) {
+      clearInterval(carouselIntervalRef.current);
+    }
+  }, [ads.length]);
 
-  const prevAd = () => {
+  const prevAd = useCallback(() => {
     setCurrentAdIndex((prev) => (prev - 1 + ads.length) % ads.length);
-  };
+    if (carouselIntervalRef.current) {
+      clearInterval(carouselIntervalRef.current);
+    }
+  }, [ads.length]);
+
+  const goToSlide = useCallback((index) => {
+    setCurrentAdIndex(index);
+    if (carouselIntervalRef.current) {
+      clearInterval(carouselIntervalRef.current);
+    }
+  }, []);
 
   if (isLoading) {
     return (
       <div className="loading-screen">
-        <div className="loading-spinner"></div>
-        <p>Loading XOMO...</p>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <div className="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <p className="loading-text">Loading XOMO...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-screen">
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={loadInitialData} className="btn btn-primary">
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="home-root">
-      {/* ENHANCED NAVIGATION */}
-      <header className="site-header">
+      {/* Enhanced Navigation */}
+      <header className={`site-header ${isScrolled ? 'scrolled' : ''}`}>
         <div className="header-inner">
           <div className="brand">
-            <a href="/" className="logo">XOMO</a>
+            <a href="/HomePage" className="logo">
+              <span className="logo-text">XOMO</span>
+              <span className="logo-accent"></span>
+            </a>
           </div>
 
           <nav className="header-nav">
-            <a href="/" className="nav-link active">Home</a>
-            <a href="/categories" className="nav-link">Categories</a>
-            <a href="/new-arrivals" className="nav-link">New Arrivals</a>
-            <a href="/collections" className="nav-link">Collections</a>
-            <a href="/contact" className="nav-link">Contact</a>
+            <a href="/HomePage" className="nav-link active">
+              <span>Home</span>
+            </a>
+            <a href="/categories" className="nav-link">
+              <span>Categories</span>
+            </a>
+            <a href="/new-arrivals" className="nav-link">
+              <span>New Arrivals</span>
+            </a>
+            <a href="/collections" className="nav-link">
+              <span>Collections</span>
+            </a>
+            <a href="/contact" className="nav-link">
+              <span>Contact</span>
+            </a>
           </nav>
 
           <div className="header-actions">
-            <div className="search-wrapper">
-              <Search className="icon" size={20} />
-            </div>
-            <a href="/profile" className="user-link">
-            <div className="user-wrapper">
-              <User className="icon" size={20} />
-            </div>
+            <button className="action-btn search-btn" aria-label="Search">
+              <Search size={20} />
+            </button>
+            <a href="/profile" className="action-btn user-btn" aria-label="Profile">
+              <User size={20} />
             </a>
-            <a href="/cart" className="cart-link">
-            <div className="cart-wrapper" title="Cart">
-              <ShoppingCart className="icon" size={20} />
-              {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
-            </div>
+            <a href="/cart" className="action-btn cart-btn" aria-label="Cart">
+              <ShoppingCart size={20} />
+              {cartCount > 0 && (
+                <span className="cart-badge">{cartCount > 99 ? '99+' : cartCount}</span>
+              )}
             </a>
 
             <button
@@ -149,301 +318,476 @@ export default function HomePage() {
               onClick={() => setMobileMenu((s) => !s)}
               aria-label="Toggle menu"
             >
-              {mobileMenu ? <X size={24} /> : <Menu size={24} />}
+              <span className="hamburger-line"></span>
+              <span className="hamburger-line"></span>
+              <span className="hamburger-line"></span>
             </button>
           </div>
         </div>
 
-        {/* ENHANCED MOBILE MENU */}
-        {mobileMenu && (
-          <div className="mobile-drawer">
-            <div className="mobile-nav">
-              <a href="/" className="mobile-nav-link">Home</a>
-              <a href="/categories" className="mobile-nav-link">Categories</a>
-              <a href="/new-arrivals" className="mobile-nav-link">New Arrivals</a>
-              <a href="/collections" className="mobile-nav-link">Collections</a>
-              <a href="/contact" className="mobile-nav-link">Contact</a>
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* ENHANCED HERO SECTION */}
-      <section className="hero">
-        <div className="hero-inner">
-          <div className="hero-content">
-            <div className="hero-copy">
-              <div className="hero-badge">New Collection</div>
-              <h1 className="hero-title">
-                Elevate Your
-                <span className="title-accent"> Everyday Style</span>
-              </h1>
-              <p className="hero-sub">
-                Minimal, premium, and built for everyday wear — discover curated collections and exclusive offers crafted for the modern individual.
-              </p>
-
-              <div className="hero-cta">
-                <a className="btn primary" href="/shop">
-                  Shop Collection
-                  <ChevronRight size={16} />
-                </a>
-                <a className="btn secondary" href="/sale">
-                  Explore Offers
-                </a>
-              </div>
-
-              <div className="hero-stats">
-                <div className="stat">
-                  <div className="stat-number">10K+</div>
-                  <div className="stat-label">Happy Customers</div>
-                </div>
-                <div className="stat">
-                  <div className="stat-number">500+</div>
-                  <div className="stat-label">Premium Products</div>
-                </div>
-                <div className="stat">
-                  <div className="stat-number">50+</div>
-                  <div className="stat-label">Brand Partners</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="hero-media">
-  <div className="hero-carousel">
-    {ads.length > 0 ? (
-      <>
-        <div className="carousel-track">
-          {ads.map((ad, idx) => (
-            <div 
-              className={`carousel-slide ${idx === currentAdIndex ? 'active' : ''}`} 
-              key={ad.id}
-              style={{ 
-                transform: `translateX(${(idx - currentAdIndex) * 100}%)`,
-                opacity: idx === currentAdIndex ? 1 : 0
-              }}
-            >
-              <img 
-                src={ad.imageUrl} 
-                alt={ad.title} 
-                className="slide-image"
-                onError={(e) => {
-                  e.target.src = '/placeholder-hero.jpg';
-                }}
-              />
-              <div className="slide-overlay">
-                <div className="slide-content">
-                  <h3>{ad.title}</h3>
-                  <p>{ad.description || 'Discover amazing offers'}</p>
-                  {ad.redirectUrl && (
-                    <a href={ad.redirectUrl} className="slide-link">
-                      Discover More
-                      <ChevronRight size={16} />
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {ads.length > 1 && (
-          <>
-            <div className="carousel-controls">
-              <button className="control-btn prev" onClick={prevAd}>
-                <ChevronRight size={20} />
-              </button>
-              <button className="control-btn next" onClick={nextAd}>
-                <ChevronRight size={20} />
-              </button>
-            </div>
-            
-            <div className="carousel-indicators">
-              {ads.map((_, idx) => (
-                <button
-                  key={idx}
-                  className={`indicator ${idx === currentAdIndex ? 'active' : ''}`}
-                  onClick={() => setCurrentAdIndex(idx)}
-                />
-              ))}
-            </div>
-          </>
-        )}
-      </>
-    ) : (
-      // Fallback when no ads
-      <div className="carousel-slide active">
-        <img 
-          src="/placeholder-hero.jpg" 
-          alt="Premium Fashion Collection" 
-          className="slide-image"
-        />
-        <div className="slide-overlay">
-          <div className="slide-content">
-            <h3>Seasonal Essentials</h3>
-            <p>Discover our curated collection for the modern wardrobe</p>
-            <a href="/shop" className="slide-link">
-              Shop Now
-              <ChevronRight size={16} />
+        {/* Enhanced Mobile Menu */}
+        <div className={`mobile-drawer ${mobileMenu ? 'open' : ''}`}>
+          <div className="mobile-nav">
+            <a href="/HomePage" className="mobile-nav-link" onClick={() => setMobileMenu(false)}>
+              Home
+            </a>
+            <a href="/categories" className="mobile-nav-link" onClick={() => setMobileMenu(false)}>
+              Categories
+            </a>
+            <a href="/new-arrivals" className="mobile-nav-link" onClick={() => setMobileMenu(false)}>
+              New Arrivals
+            </a>
+            <a href="/collections" className="mobile-nav-link" onClick={() => setMobileMenu(false)}>
+              Collections
+            </a>
+            <a href="/contact" className="mobile-nav-link" onClick={() => setMobileMenu(false)}>
+              Contact
             </a>
           </div>
         </div>
-      </div>
-    )}
-  </div>
-</div>
+      </header>
+
+      {/* Scroll Progress Indicator */}
+      <div className="scroll-progress" style={{ width: `${scrollProgress}%` }}></div>
+
+      {/* Professional Hero Section - Complete Redesign */}
+      <section className="hero-pro" ref={heroRef} data-animate id="hero">
+        {/* Animated Background Layers */}
+        <div className="hero-pro-bg" ref={parallaxRef}>
+          <div className="bg-layer layer-1"></div>
+          <div className="bg-layer layer-2"></div>
+          <div className="bg-layer layer-3"></div>
+          <div className="bg-particles">
+            {[...Array(20)].map((_, i) => (
+              <div key={i} className="particle" style={{ '--delay': `${i * 0.1}s` }}></div>
+            ))}
+          </div>
+        </div>
+
+        <div className="hero-pro-container">
+          <div className="hero-pro-layout">
+            {/* Left Side - Content */}
+            <div className="hero-pro-content">
+              {/* Animated Badge */}
+              <div className="hero-pro-badge" data-animate>
+                <div className="badge-pulse-ring"></div>
+                <Sparkles className="badge-icon-pro" size={16} />
+                <span className="badge-text">New Collection 2024</span>
+                <div className="badge-shine"></div>
+              </div>
+
+              {/* Main Heading with Split Animation */}
+              <h1 className="hero-pro-title" data-animate>
+                <span className="title-line-1">
+                  <span className="word">Fashion</span>
+                  <span className="word">That</span>
+                </span>
+                <span className="title-line-2">
+                  <span className="word gradient-word">Defines</span>
+                  <span className="word">You</span>
+                </span>
+              </h1>
+
+              {/* Description with Fade */}
+              <p className="hero-pro-desc" data-animate>
+                Experience premium fashion curated for the modern lifestyle. 
+                Where quality craftsmanship meets contemporary design in every detail.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="hero-pro-actions" data-animate>
+                <a href="/categories" className="btn-pro btn-pro-primary">
+                  <span className="btn-text">Shop Collection</span>
+                  <div className="btn-icon-wrapper">
+                    <ArrowRight size={18} />
+                  </div>
+                  <div className="btn-bg-effect"></div>
+                </a>
+                <a href="/collections" className="btn-pro btn-pro-outline">
+                  <Play size={18} />
+                  <span className="btn-text">Watch Story</span>
+                </a>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="hero-pro-trust" data-animate>
+                <div className="trust-item">
+                  <div className="trust-icon">
+                    <TrendingUp size={18} />
+                  </div>
+                  <div className="trust-content">
+                    <div className="trust-number" data-count="10">0</div>
+                    <div className="trust-label">K+ Customers</div>
+                  </div>
+                </div>
+                <div className="trust-divider"></div>
+                <div className="trust-item">
+                  <div className="trust-icon">
+                    <Award size={18} />
+                  </div>
+                  <div className="trust-content">
+                    <div className="trust-number" data-count="500">0</div>
+                    <div className="trust-label">Products</div>
+                  </div>
+                </div>
+                <div className="trust-divider"></div>
+                <div className="trust-item">
+                  <div className="trust-icon">
+                    <Star size={18} />
+                  </div>
+                  <div className="trust-content">
+                    <div className="trust-number" data-count="50">0</div>
+                    <div className="trust-label">Brands</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Visual Showcase */}
+            <div className="hero-pro-visual" data-animate>
+              <div className="visual-container">
+                {ads.length > 0 ? (
+                  <>
+                    <div className="visual-carousel">
+                      {ads.map((ad, idx) => (
+                        <div
+                          key={ad.id || idx}
+                          className={`visual-slide ${idx === currentAdIndex ? 'active' : ''}`}
+                        >
+                          <div className="slide-frame">
+                            <div className="slide-image-box">
+                              <img
+                                src={ad.imageUrl}
+                                alt={ad.title || 'Collection'}
+                                className="slide-img"
+                                loading={idx === 0 ? 'eager' : 'lazy'}
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextElementSibling?.classList.add('show');
+                                }}
+                              />
+                              <div className="slide-placeholder-pro">
+                                <Sparkles size={40} />
+                              </div>
+                              <div className="slide-overlay-pro">
+                                {ad.title && (
+                                  <div className="slide-info">
+                                    <h3>{ad.title}</h3>
+                                    {ad.description && <p>{ad.description}</p>}
+                                    {ad.redirectUrl && (
+                                      <a href={ad.redirectUrl} className="slide-link-pro">
+                                        Explore <ChevronRight size={16} />
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {ads.length > 1 && (
+                      <>
+                        <div className="visual-controls">
+                          <button
+                            className="control-arrow prev-arrow"
+                            onClick={prevAd}
+                            aria-label="Previous"
+                          >
+                            <ChevronLeft size={20} />
+                          </button>
+                          <button
+                            className="control-arrow next-arrow"
+                            onClick={nextAd}
+                            aria-label="Next"
+                          >
+                            <ChevronRight size={20} />
+                          </button>
+                        </div>
+                        <div className="visual-indicators">
+                          {ads.map((_, idx) => (
+                            <button
+                              key={idx}
+                              className={`indicator-dot ${idx === currentAdIndex ? 'active' : ''}`}
+                              onClick={() => goToSlide(idx)}
+                              aria-label={`Slide ${idx + 1}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <div className="visual-carousel">
+                    <div className="visual-slide active">
+                      <div className="slide-frame">
+                        <div className="slide-image-box">
+                          <div className="slide-placeholder-pro show">
+                            <Sparkles size={40} />
+                            <p>Premium Collection</p>
+                          </div>
+                          <div className="slide-overlay-pro">
+                            <div className="slide-info">
+                              <h3>Seasonal Essentials</h3>
+                              <p>Discover our curated collection</p>
+                              <a href="/categories" className="slide-link-pro">
+                                Shop Now <ChevronRight size={16} />
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Floating Feature Cards */}
+                <div className="visual-features">
+                  <div className="feature-float float-1">
+                    <div className="float-icon">
+                      <Star size={18} />
+                    </div>
+                    <div className="float-text">
+                      <span>Premium</span>
+                    </div>
+                  </div>
+                  <div className="feature-float float-2">
+                    <div className="float-icon">
+                      <Truck size={18} />
+                    </div>
+                    <div className="float-text">
+                      <span>Free Shipping</span>
+                    </div>
+                  </div>
+                  <div className="feature-float float-3">
+                    <div className="float-icon">
+                      <Shield size={18} />
+                    </div>
+                    <div className="float-text">
+                      <span>Secure</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ENHANCED FEATURES STRIP */}
-      <section className="features-strip">
-        <div className="features-inner">
-          <div className="feature-item">
-            <Truck className="feature-icon" size={24} />
-            <div className="feature-content">
-              <div className="feature-title">Free Shipping</div>
-              <div className="feature-desc">On orders ₹999+</div>
+      {/* Professional Features Strip */}
+      <section className="features-pro" data-animate id="features">
+        <div className="features-pro-container">
+          {[
+            { icon: Truck, title: "Free Shipping", desc: "On orders ₹999+", color: "#667eea" },
+            { icon: RotateCcw, title: "Easy Returns", desc: "15 days hassle-free", color: "#764ba2" },
+            { icon: Shield, title: "Secure Payment", desc: "100% protected", color: "#f093fb" },
+            { icon: Star, title: "Premium Quality", desc: "Guaranteed", color: "#4facfe" },
+          ].map((feature, idx) => (
+            <div
+              key={idx}
+              className="feature-pro-card"
+              data-animate
+              style={{ '--feature-color': feature.color, '--delay': `${idx * 0.1}s` }}
+            >
+              <div className="feature-pro-icon-wrapper">
+                <div className="feature-pro-icon-bg"></div>
+                <feature.icon className="feature-pro-icon" size={24} />
+                <div className="feature-pro-icon-glow"></div>
+              </div>
+              <div className="feature-pro-content">
+                <h3 className="feature-pro-title">{feature.title}</h3>
+                <p className="feature-pro-desc">{feature.desc}</p>
+              </div>
+              <div className="feature-pro-hover-effect"></div>
             </div>
-          </div>
-          
-          <div className="feature-item">
-            <RotateCcw className="feature-icon" size={24} />
-            <div className="feature-content">
-              <div className="feature-title">Easy Returns</div>
-              <div className="feature-desc">15 days hassle-free</div>
-            </div>
-          </div>
-          
-          <div className="feature-item">
-            <Shield className="feature-icon" size={24} />
-            <div className="feature-content">
-              <div className="feature-title">Secure Payment</div>
-              <div className="feature-desc">100% protected</div>
-            </div>
-          </div>
-          
-          <div className="feature-item">
-            <Star className="feature-icon" size={24} />
-            <div className="feature-content">
-              <div className="feature-title">Premium Quality</div>
-              <div className="feature-desc">Guaranteed</div>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
-      {/* ENHANCED CATEGORIES SECTION */}
+
+      {/* Professional Categories Section */}
       <main className="main-content">
-  <section className="categories-section">
-    <div className="section-header">
-      <h2 className="section-title">Shop by Category</h2>
-      <p className="section-subtitle">Discover our carefully curated collections</p>
-      <a href="/categories" className="section-link">
-        View All Categories
-        <ChevronRight size={16} />
-      </a>
-    </div>
-
-    <div className="category-grid-round">
-      {categories.map((cat, index) => (
-        <a 
-          key={cat.id} 
-          className="category-card-round" 
-          href={`/category/${cat.id}`}
-          style={{ animationDelay: `${index * 0.1}s` }}
-        >
-          <div className="cat-media-round">
-            <img src={cat.imageUrl} alt={cat.name} />
-            <div className="cat-overlay-round">
-              <span className="cat-explore-round">
-                Explore
-                <ChevronRight size={16} />
-              </span>
-            </div>
-          </div>
-          <div className="cat-info-round">
-            <div className="cat-name-round">{cat.name}</div>
-            <div className="cat-products-round">{cat.productCount || 'Various'} products</div>
-          </div>
-        </a>
-      ))}
-    </div>
-  </section>
-
-  {/* NEW FEATURED PRODUCTS SECTION */}
-  <section className="featured-section">
-    <div className="section-header">
-      <h2 className="section-title">New Arrivals</h2>
-      <p className="section-subtitle">Fresh styles for the season</p>
-    </div>
-    <div className="product-grid-round">
-      <div className="product-card-round">
-        <div className="product-image-round"></div>
-        <div className="product-info-round">
-          <div className="product-name-round">Premium T-Shirt</div>
-          <div className="product-price-round">₹1,999</div>
-        </div>
-      </div>
-      <div className="product-card-round">
-        <div className="product-image-round"></div>
-        <div className="product-info-round">
-          <div className="product-name-round">Designer Jeans</div>
-          <div className="product-price-round">₹3,499</div>
-        </div>
-      </div>
-      <div className="product-card-round">
-        <div className="product-image-round"></div>
-        <div className="product-info-round">
-          <div className="product-name-round">Classic Blazer</div>
-          <div className="product-price-round">₹5,999</div>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
-
-      {/* ENHANCED FOOTER */}
-      <footer className="site-footer">
-        <div className="footer-inner">
-          <div className="footer-main">
-            <div className="footer-brand">
-              <div className="logo">XOMO</div>
-              <p className="footer-desc">
-                Premium fashion for the modern individual. Quality, style, and comfort in every piece.
+        <section className="categories-pro" data-animate id="categories">
+          <div className="section-header-pro">
+            <div className="section-header-content-pro">
+              <div className="section-badge-pro">
+                <Sparkles size={14} />
+                <span>Collections</span>
+              </div>
+              <h2 className="section-title-pro">
+                Shop by <span className="title-highlight-pro">Category</span>
+              </h2>
+              <p className="section-subtitle-pro">
+                Discover our carefully curated collections designed for every style and occasion
               </p>
             </div>
-            
-            <div className="footer-links">
-              <div className="link-group">
-                <h4>Shop</h4>
-                <a href="/new-arrivals">New Arrivals</a>
-                <a href="/best-sellers">Best Sellers</a>
-                <a href="/sale">Sale</a>
-                <a href="/collections">Collections</a>
+            <a href="/categories" className="section-cta-pro">
+              <span>View All</span>
+              <ChevronRight size={18} />
+            </a>
+          </div>
+
+          <div className="category-grid-pro">
+            {categories.length > 0 ? (
+              categories.map((cat, index) => (
+                <a
+                  key={cat.id}
+                  href={`/category/${cat.id}`}
+                  className="category-card-pro"
+                  data-animate
+                  style={{ '--delay': `${index * 0.1}s` }}
+                >
+                  <div className="category-image-wrapper-pro">
+                    <img
+                      src={cat.imageUrl}
+                      alt={cat.name}
+                      className="category-image-pro"
+                      loading="lazy"
+                    />
+                    <div className="category-overlay-pro">
+                      <div className="category-overlay-content-pro">
+                        <span className="explore-text-pro">
+                          Explore
+                          <ChevronRight size={18} />
+                        </span>
+                      </div>
+                    </div>
+                    <div className="category-shine-pro"></div>
+                    <div className="category-pulse-ring"></div>
+                  </div>
+                  <div className="category-info-pro">
+                    <h3 className="category-name-pro">{cat.name}</h3>
+                    <p className="category-count-pro">
+                      {cat.productCount || 'Various'} products
+                    </p>
+                  </div>
+                </a>
+              ))
+            ) : (
+              <div className="empty-categories-pro">
+                <Sparkles size={32} />
+                <p>No categories available at the moment.</p>
               </div>
-              
-              <div className="link-group">
-                <h4>Support</h4>
-                <a href="/contact">Contact Us</a>
-                <a href="/shipping">Shipping Info</a>
-                <a href="/returns">Returns</a>
-                <a href="/faq">FAQ</a>
+            )}
+          </div>
+        </section>
+
+        {/* Professional Featured Products Section */}
+        <section className="featured-products-pro" data-animate id="featured">
+          <div className="section-header-pro">
+            <div className="section-header-content-pro">
+              <div className="section-badge-pro">
+                <TrendingUp size={14} />
+                <span>Latest</span>
               </div>
-              
-              <div className="link-group">
-                <h4>Company</h4>
-                <a href="/about">About Us</a>
-                <a href="/careers">Careers</a>
-                <a href="/press">Press</a>
-                <a href="/sustainability">Sustainability</a>
+              <h2 className="section-title-pro">
+                New <span className="title-highlight-pro">Arrivals</span>
+              </h2>
+              <p className="section-subtitle-pro">
+                Fresh styles for the season, handpicked for you
+              </p>
+            </div>
+            <a href="/new-arrivals" className="section-cta-pro">
+              <span>See All</span>
+              <ChevronRight size={18} />
+            </a>
+          </div>
+
+          <div className="products-grid-pro">
+            {[1, 2, 3].map((item, idx) => (
+              <div key={idx} className="product-card-pro" data-animate style={{ '--delay': `${idx * 0.1}s` }}>
+                <div className="product-image-wrapper-pro">
+                  <div className="product-image-placeholder-pro">
+                    <Sparkles size={32} />
+                  </div>
+                  <div className="product-actions-pro">
+                    <button className="product-action-btn-pro" aria-label="Add to wishlist">
+                      <Heart size={18} />
+                    </button>
+                    <button className="product-action-btn-pro" aria-label="Quick view">
+                      <Search size={18} />
+                    </button>
+                  </div>
+                  <div className="product-badge-pro">
+                    <span>New</span>
+                  </div>
+                  <div className="product-hover-overlay"></div>
+                </div>
+                <div className="product-info-pro">
+                  <h3 className="product-name-pro">Premium Product {idx + 1}</h3>
+                  <div className="product-rating-pro">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={14} className="star-icon-pro" fill="#fbbf24" />
+                    ))}
+                    <span className="rating-text-pro">(4.8)</span>
+                  </div>
+                  <div className="product-price-pro">
+                    <span className="price-current-pro">₹{1999 + idx * 500}</span>
+                    {idx === 0 && (
+                      <span className="price-original-pro">₹2,499</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* Professional Footer */}
+      <footer className="footer-pro">
+        <div className="footer-pro-container">
+          <div className="footer-pro-main">
+            <div className="footer-pro-brand">
+              <div className="footer-pro-logo">
+                <span className="logo-text-pro">XOMO</span>
+                <span className="logo-accent-pro"></span>
+              </div>
+              <p className="footer-pro-description">
+                Premium fashion for the modern individual. Quality, style, and comfort 
+                in every piece. Experience the difference.
+              </p>
+            </div>
+
+            <div className="footer-pro-links-grid">
+              <div className="footer-pro-column">
+                <h4 className="footer-pro-heading">Shop</h4>
+                <ul className="footer-pro-list">
+                  <li><a href="/new-arrivals">New Arrivals</a></li>
+                  <li><a href="/best-sellers">Best Sellers</a></li>
+                  <li><a href="/sale">Sale</a></li>
+                  <li><a href="/collections">Collections</a></li>
+                </ul>
+              </div>
+
+              <div className="footer-pro-column">
+                <h4 className="footer-pro-heading">Support</h4>
+                <ul className="footer-pro-list">
+                  <li><a href="/contact">Contact Us</a></li>
+                  <li><a href="/shipping">Shipping Info</a></li>
+                  <li><a href="/returns">Returns</a></li>
+                  <li><a href="/faq">FAQ</a></li>
+                </ul>
+              </div>
+
+              <div className="footer-pro-column">
+                <h4 className="footer-pro-heading">Company</h4>
+                <ul className="footer-pro-list">
+                  <li><a href="/about">About Us</a></li>
+                  <li><a href="/careers">Careers</a></li>
+                  <li><a href="/press">Press</a></li>
+                  <li><a href="/sustainability">Sustainability</a></li>
+                </ul>
               </div>
             </div>
           </div>
-          
-          <div className="footer-bottom">
-            <div className="copyright">
+
+          <div className="footer-pro-bottom">
+            <div className="footer-pro-copyright">
               © {new Date().getFullYear()} XOMO. All rights reserved.
             </div>
-            <div className="footer-legal">
+            <div className="footer-pro-legal">
               <a href="/terms">Terms</a>
               <a href="/privacy">Privacy</a>
               <a href="/cookies">Cookies</a>

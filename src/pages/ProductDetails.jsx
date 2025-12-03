@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft, ShoppingCart, Star, Truck, ShieldCheck, Heart } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Star, Truck, ShieldCheck, Heart, Sparkles } from "lucide-react";
+import Header from "../components/Header";
 import "../styles/productDetails.css";
+import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
 
 
@@ -185,6 +187,15 @@ export default function ProductDetails() {
     navigate(`/product/${productId}`);
   };
 
+  const handleBack = () => {
+    // Check if there's a previous page in history, otherwise go to homepage
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
   const renderStars = (rating) => {
     const numRating = typeof rating === 'number' ? rating : parseFloat(rating) || 0;
     return Array.from({ length: 5 }, (_, index) => (
@@ -249,16 +260,39 @@ export default function ProductDetails() {
   }
 
   return (
-    <div className="product-details-page">
-      {/* Header + Back Button */}
-      <header className="details-header">
+    <>
+      <Header />
+      <div className="product-details-page">
+        {/* Back Button Section */}
+        <div className="details-header">
         <div className="container">
-          <button className="details-back-btn" onClick={() => navigate(-1)}>
-            <ChevronLeft size={22} />
-            Back
-          </button>
+          <div className="header-content">
+            <button 
+              className="back-btn-pro" 
+              onClick={handleBack}
+              aria-label="Go back to previous page"
+              type="button"
+            >
+              <span className="back-btn-glow"></span>
+              <span className="back-btn-border"></span>
+              <span className="back-btn-content">
+                <span className="back-icon-wrapper">
+                  <ArrowLeft size={18} strokeWidth={2.5} />
+                </span>
+                <span className="back-text">Back</span>
+              </span>
+            </button>
+            
+            <div className="breadcrumb-trail">
+              <span className="breadcrumb-item" onClick={() => navigate('/')}>Home</span>
+              <span className="breadcrumb-separator">/</span>
+              <span className="breadcrumb-item" onClick={() => navigate('/categories')}>Products</span>
+              <span className="breadcrumb-separator">/</span>
+              <span className="breadcrumb-current">{product?.name?.slice(0, 20) || 'Details'}...</span>
+            </div>
+          </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Product Content */}
       <div className="details-container">
@@ -415,6 +449,7 @@ export default function ProductDetails() {
           </section>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

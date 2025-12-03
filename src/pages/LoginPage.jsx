@@ -1,8 +1,9 @@
 import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, ArrowRight, Eye, EyeOff, Sparkles } from "lucide-react";
 import "../styles/login.css";
+import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
 
 export default function LoginPage() {
@@ -80,89 +81,95 @@ useEffect(() => {
 }, []);
 
   return (
-    <div className="auth-container">
-      <div className="auth-background">
-        <div className="auth-gradient"></div>
+    <div className="auth-page-pro">
+      <div className="auth-background-pro">
+        <div className="bg-blob-pro blob-1"></div>
+        <div className="bg-blob-pro blob-2"></div>
+        <div className="bg-blob-pro blob-3"></div>
       </div>
       
-      <div className="auth-card">
-        <div className="auth-header">
-          <div className="brand-logo">XOMO</div>
-          <h1 className="auth-title">Welcome Back</h1>
-          <p className="auth-subtitle">Sign in to your XOMO account</p>
+      <div className="auth-card-pro">
+        <div className="auth-header-pro">
+          <div className="brand-logo-pro">
+            <span className="logo-text-pro">XOMO</span>
+            <span className="logo-accent-pro"></span>
+          </div>
+          <h1 className="auth-title-pro">Welcome Back</h1>
+          <p className="auth-subtitle-pro">Sign in to your XOMO account</p>
         </div>
 
-        <div className="auth-form">
-          <div className="input-group">
-            <div className="input-wrapper">
-              <Mail className="input-icon" size={20} />
+        <div className="auth-form-pro">
+          <div className="input-group-pro">
+            <div className="input-wrapper-pro">
+              <Mail className="input-icon-pro" size={20} />
               <input
                 type="email"
                 name="email"
                 placeholder="Email address"
                 onChange={handleChange}
                 onKeyPress={handleKeyPress}
-                className="auth-input"
+                className="auth-input-pro"
               />
             </div>
           </div>
 
-          <div className="input-group">
-            <div className="input-wrapper">
-              <Lock className="input-icon" size={20} />
+          <div className="input-group-pro">
+            <div className="input-wrapper-pro">
+              <Lock className="input-icon-pro" size={20} />
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Password"
                 onChange={handleChange}
                 onKeyPress={handleKeyPress}
-                className="auth-input"
+                className="auth-input-pro"
               />
               <button 
                 type="button"
-                className="password-toggle"
+                className="password-toggle-pro"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label="Toggle password visibility"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>
 
-          <div className="auth-options">
-            <label className="checkbox-wrapper">
+          <div className="auth-options-pro">
+            <label className="checkbox-wrapper-pro">
               <input type="checkbox" />
-              <span className="checkmark"></span>
-              Remember me
+              <span className="checkmark-pro"></span>
+              <span>Remember me</span>
             </label>
-            <a href="/forgot-password" className="forgot-link">Forgot password?</a>
+            <a href="/forgot-password" className="forgot-link-pro">Forgot password?</a>
           </div>
 
           <button 
-            className={`auth-btn primary ${isLoading ? 'loading' : ''}`} 
+            className={`auth-btn-pro primary-pro ${isLoading ? 'loading' : ''}`} 
             onClick={loginUser}
             disabled={isLoading}
           >
             {isLoading ? (
-              <div className="spinner"></div>
+              <div className="shared-spinner shared-spinner-small"></div>
             ) : (
               <>
-                Sign In
+                <span>Sign In</span>
                 <ArrowRight size={18} />
               </>
             )}
           </button>
 
-          <div className="auth-divider">
+          <div className="auth-divider-pro">
             <span>or</span>
           </div>
 
-         <div id="googleLoginBtn" className="google-btn-container"></div>
+          <div id="googleLoginBtn" className="google-btn-container-pro"></div>
         </div>
 
-        <div className="auth-footer">
+        <div className="auth-footer-pro">
           <p>
             Don't have an account?{" "}
-            <a href="/register" className="auth-link">Create account</a>
+            <a href="/register" className="auth-link-pro">Create account</a>
           </p>
         </div>
       </div>
