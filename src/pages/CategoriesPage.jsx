@@ -4,6 +4,7 @@ import { ChevronRight, Search, Filter, Grid, List, Sparkles, TrendingUp } from "
 import Header from "../components/Header";
 import "../styles/categories.css";
 import "../styles/shared.css";
+import { BASE_URL } from "../util/config.js";
 
 const host = window.location.hostname;
 const backendPort = 8081;
@@ -38,7 +39,7 @@ export default function CategoriesPage() {
 
       const authHeader = { headers: { Authorization: `Bearer ${token}` } };
       const response = await axios.get(
-        `http://${host}:${backendPort}/categories`,
+        `${BASE_URL}/categories`,
         authHeader
       );
 

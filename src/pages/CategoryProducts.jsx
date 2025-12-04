@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, ShoppingCart, Heart, Star, Grid, List } from "lucide-react";
 import Header from "../components/Header";
+import AlertModal from "../components/AlertModal";
 import "../styles/categoryProducts.css";
 import { BASE_URL } from "../util/config.js";
 
@@ -17,6 +18,15 @@ export default function CategoryProducts() {
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState("name");
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
+
+  const showAlert = (message, type = "error") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "error" });
+  };
 
   useEffect(() => {
     loadProductsByCategory();
@@ -76,8 +86,60 @@ export default function CategoryProducts() {
     }
   };
 
-  const addToCart = (product) => {
-    console.log("Added to cart:", product);
+  const addToCart = async (product) => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      if (!token || !userId) {
+        showAlert("Please login to add items to cart", "error");
+        return;
+      }
+
+      await axios.post(
+        `${BASE_URL}/cart/add`,
+        { 
+          userId: String(userId), 
+          productId: String(product.id), 
+          quantity: 1 
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      showAlert("Product added to cart!", "success");
+    } catch (err) {
+      console.error("Cart error:", err);
+      showAlert("Failed to add to cart. Please try again.", "error");
+    }
+  };
+
+  const addToWishlist = async (product) => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      if (!token || !userId) {
+        showAlert("Please login to add items to wishlist", "error");
+        return;
+      }
+
+      await axios.post(
+        `${BASE_URL}/wishlist/add`,
+        { 
+          productId:(product.id)
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      showAlert("Product added to wishlist!", "success");
+    } catch (err) {
+      console.error("Wishlist error:", err);
+      if (err.response?.status === 409) {
+        showAlert("Product already in wishlist", "info");
+      } else {
+        showAlert("Failed to add to wishlist. Please try again.", "error");
+      }
+    }
   };
 
   const formatPrice = (price) => {
@@ -171,20 +233,32 @@ export default function CategoryProducts() {
         <div className="container">
           <div className={`products-container ${viewMode}`}>
             {sortedProducts.map((product) => (
-              <Link 
-  to={`/product/${product.id}`} 
-  className="product-card" 
-  key={product.id}
-> 
+              <div 
+                className="product-card" 
+                key={product.id}
+              > 
                 <div className="product-media">
-                  <img 
-                    src={product.imageUrl} 
-                    alt={product.name}
-                    className="product-image"
-                  />
+                  <Link to={`/product/${product.id}`} className="product-image-link">
+                    <img 
+                      src={product.imageUrl} 
+                      alt={product.name}
+                      className="product-image"
+                      onError={(e) => {
+                        e.target.src = "/placeholder-product.jpg";
+                      }}
+                    />
+                  </Link>
                   
                   <div className="product-actions">
-                    <button className="action-btn wishlist">
+                    <button 
+                      className="action-btn wishlist"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addToWishlist(product);
+                      }}
+                      aria-label="Add to wishlist"
+                    >
                       <Heart size={16} />
                     </button>
                     {product.discount > 0 && (
@@ -197,7 +271,12 @@ export default function CategoryProducts() {
 
                   <button 
                     className="quick-add-btn"
-                    onClick={() => addToCart(product)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      addToCart(product);
+                    }}
+                    aria-label="Add to cart"
                   >
                     <ShoppingCart size={14} />
                     Add
@@ -205,7 +284,9 @@ export default function CategoryProducts() {
                 </div>
 
                 <div className="product-info">
-                  <h3 className="product-name">{product.name}</h3>
+                  <Link to={`/product/${product.id}`} className="product-name-link">
+                    <h3 className="product-name">{product.name}</h3>
+                  </Link>
                   
                   <div className="product-meta">
                     <div className="product-rating">
@@ -225,7 +306,7 @@ export default function CategoryProducts() {
                     )}
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 
@@ -246,6 +327,13 @@ export default function CategoryProducts() {
         </div>
       </main>
       </div>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </>
   );
 }

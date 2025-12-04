@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import AlertModal from "../components/AlertModal";
 import "../styles/orders.css";
 import { BASE_URL } from "../util/config.js";
 
@@ -24,6 +25,15 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "info" });
+
+  const showAlert = (message, type = "info") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "info" });
+  };
 
   const authHeader = () => {
     const token = localStorage.getItem("token");
@@ -282,8 +292,8 @@ export default function OrdersPage() {
                       <div className="order-item-media">
                         <img
                           src={
-                            item.product?.imageBase64
-                              ? `data:image/jpeg;base64,${item.product.imageBase64}`
+                            item.product?.image
+                              ? `data:image/jpeg;base64,${item.product?.image}`
                               : item.imageUrl || "/placeholder-product.jpg"
                           }
                           alt={item.product?.name || "Product"}
@@ -338,7 +348,7 @@ export default function OrdersPage() {
                     <div className="info-content">
                       <div className="info-label">Payment Method</div>
                       <div className="info-value">
-                        {order.paymentMethod || "Not specified"}
+                        {order.itempaymentMethod || "Not specified"}
                       </div>
                     </div>
                   </div>
@@ -369,7 +379,7 @@ export default function OrdersPage() {
                       className="btn secondary"
                       onClick={() => {
                         // Add tracking functionality
-                        alert(`Tracking order ${order.orderId || order.id}`);
+                        showAlert(`Tracking order ${order.orderId || order.id}`, "info");
                       }}
                     >
                       Track Order
@@ -390,6 +400,13 @@ export default function OrdersPage() {
         )}
       </div>
       </div>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </>
   );
 }

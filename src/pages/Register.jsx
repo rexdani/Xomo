@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Mail, Lock, User, Phone, MapPin, ArrowRight, Eye, EyeOff, Sparkles } from "lucide-react";
+import AlertModal from "../components/AlertModal";
 import "../styles/register.css";
 import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
@@ -19,6 +20,15 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
+
+  const showAlert = (message, type = "error") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "error" });
+  };
 
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
@@ -55,10 +65,10 @@ const host = window.location.hostname;
         }
       );
 
-      alert(response.data.message || "Registration successful! Please login.");
-      window.location.href = "/";
+      showAlert(response.data.message || "Registration successful! Please login.", "success");
+      setTimeout(() => { window.location.href = "/"; }, 1500);
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed. Please try again.");
+      showAlert(err.response?.data?.message || "Registration failed. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -66,11 +76,11 @@ const host = window.location.hostname;
 
   const validateForm = () => {
     if (!user.fullName || !user.email || !user.password || !user.phone) {
-      alert("Please fill in all required fields");
+      showAlert("Please fill in all required fields", "error");
       return false;
     }
     if (user.password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      showAlert("Password must be at least 6 characters long", "error");
       return false;
     }
     return true;
@@ -300,6 +310,13 @@ const host = window.location.hostname;
           </p>
         </div>
       </div>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </div>
   );
 }

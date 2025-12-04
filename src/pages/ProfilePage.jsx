@@ -17,6 +17,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import Header from "../components/Header";
+import AlertModal from "../components/AlertModal";
 import "../styles/ProfilePage.css";
 import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
@@ -32,6 +33,15 @@ export default function ProfilePage() {
   const [editForm, setEditForm] = useState({});
   const [orders, setOrders] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
+
+  const showAlert = (message, type = "error") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "error" });
+  };
 
   useEffect(() => {
     loadUserProfile();
@@ -78,8 +88,7 @@ export default function ProfilePage() {
           country: "",
           postalCode: ""
         },
-        joinDate: u.createdAt || new Date().toISOString(),
-        avatar: u.avatar || "/placeholder-avatar.jpg"
+        joinDate: u.createdAt || new Date().toISOString()
       };
 
       setUser(formattedUser);
@@ -136,10 +145,10 @@ export default function ProfilePage() {
 
       setUser(editForm);
       setIsEditing(false);
-      alert("Profile updated successfully!");
+      showAlert("Profile updated successfully!", "success");
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile.");
+      showAlert("Failed to update profile.", "error");
     }
   };
 
@@ -214,11 +223,11 @@ export default function ProfilePage() {
               <ArrowLeft size={20} />
               <span>Back</span>
             </button>
-          </div>
-      
-          <div className="shared-container">
-            <h1 className="page-title-pro">My Account</h1>
-            <p className="page-subtitle-pro">Manage your profile and preferences</p>
+            
+            <div className="header-content-pro">
+              <h1 className="page-title-pro">My Account</h1>
+              <p className="page-subtitle-pro">Manage your profile and preferences</p>
+            </div>
           </div>
         </div>
 
@@ -229,10 +238,6 @@ export default function ProfilePage() {
             {/* Professional Sidebar */}
             <aside className="profile-sidebar-pro">
               <div className="user-card-pro">
-                <div className="user-avatar-pro">
-                  <img src={user.avatar} alt={user.name} />
-                  <div className="avatar-ring-pro"></div>
-                </div>
                 <div className="user-info-pro">
                   <h3 className="user-name-pro">{user.name}</h3>
                   <p className="user-email-pro">{user.email}</p>
@@ -466,6 +471,13 @@ export default function ProfilePage() {
         </div>
       </div>
       </div>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </>
   );
 }

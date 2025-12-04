@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeft, ShoppingCart, Star, Truck, ShieldCheck, Heart, Sparkles } from "lucide-react";
 import Header from "../components/Header";
+import AlertModal from "../components/AlertModal";
 import "../styles/productDetails.css";
 import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
@@ -18,6 +19,15 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [similarLoading, setSimilarLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
+
+  const showAlert = (message, type = "error") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "error" });
+  };
 
   useEffect(() => {
     loadProduct();
@@ -157,7 +167,7 @@ export default function ProductDetails() {
       const userId = localStorage.getItem("userId");
 
       if (!token || !userId) {
-        alert("Please login to add items to cart");
+        showAlert("Please login to add items to cart", "error");
         return;
       }
 
@@ -171,17 +181,17 @@ export default function ProductDetails() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Product added to cart!");
+      showAlert("Product added to cart!", "success");
     } catch (err) {
       console.error("Cart error:", err);
-      alert("Failed to add to cart. Please try again.");
+      showAlert("Failed to add to cart. Please try again.", "error");
     }
   };
 
   const navigateToProduct = (productId) => {
     if (productId.startsWith('similar-')) {
       // For fallback products, show a message or stay on current page
-      alert("This is a demo similar product. In a real app, this would navigate to the actual product.");
+      showAlert("This is a demo similar product. In a real app, this would navigate to the actual product.", "info");
       return;
     }
     navigate(`/product/${productId}`);
@@ -450,6 +460,13 @@ export default function ProductDetails() {
         </div>
       </div>
       </div>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </>
   );
 }

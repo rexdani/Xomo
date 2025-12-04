@@ -14,6 +14,7 @@ import {
   Star
 } from "lucide-react";
 import Header from "../components/Header";
+import AlertModal from "../components/AlertModal";
 import "../styles/checkout.css";
 import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
@@ -25,14 +26,30 @@ export default function CheckoutPage() {
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
 
-  const [deliveryDate, setDeliveryDate] = useState("");
+  // Auto-set delivery date to 7 days from now
+  const getDeliveryDate = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return d.toISOString().split("T")[0];
+  };
+  
+  const [deliveryDate] = useState(getDeliveryDate());
   const [paymentMode, setPaymentMode] = useState("");
 
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
 
   const userId = localStorage.getItem("userId");
+
+  const showAlert = (message, type = "error") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "error" });
+  };
 
   const authHeader = () => {
     const token = localStorage.getItem("token");
@@ -93,30 +110,22 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.18;
   const total = subtotal + shipping + tax;
 
-  // Delivery dates
-  const getDeliveryDates = () => {
-    const dates = [];
-    for (let i = 1; i <= 7; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      const formattedDate = d.toLocaleDateString("en-IN", {
-        weekday: "short",
-        day: "numeric",
-        month: "short"
-      });
-      dates.push({
-        value: d.toISOString().split("T")[0],
-        label: formattedDate,
-        isExpress: i <= 2
-      });
-    }
-    return dates;
+  // Format delivery date for display
+  const formatDeliveryDate = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return d.toLocaleDateString("en-IN", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
   };
 
  // Razorpay Payment
 const startPayment = async () => {
   if (paymentMode !== "RAZORPAY") {
-    alert("Please select Razorpay Online Payment");
+    showAlert("Please select Razorpay Online Payment", "error");
     return;
   }
 
@@ -144,14 +153,10 @@ const startPayment = async () => {
         try {
           // Build order payload
           const payload = {
-            userId,
+           
             addressId: selectedAddress,
-            deliveryDate,
-            paymentMode,
-            items: cart.map(i => ({
-              productId: i.productId,
-              quantity: i.quantity
-            }))
+            paymentMethod:"RAZORPAY"
+            
           };
 
           // 4. Final order placement to backend
@@ -161,12 +166,12 @@ const startPayment = async () => {
             authHeader()
           );
 
-          alert("Payment Successful!");
-          navigate("/order-success");
+          showAlert("Payment Successful!", "success");
+          setTimeout(() => navigate("/order-success"), 1500);
 
         } catch (error) {
           console.error("Order placement failed after payment:", error);
-          alert("Payment succeeded, but order placement failed!");
+          showAlert("Payment succeeded, but order placement failed!", "error");
         }
       },
 
@@ -184,20 +189,25 @@ const startPayment = async () => {
     rzp.open();
 
     rzp.on("payment.failed", function () {
-      alert("Payment Failed");
-      navigate("/payment-failed");
+      showAlert("Payment Failed", "error");
+      setTimeout(() => navigate("/payment-failed"), 1500);
     });
 
   } catch (err) {
     console.error("Error starting payment:", err);
-    alert("Failed to start payment");
+    showAlert("Failed to start payment", "error");
   }
 };
 
   const placeOrder = async () => {
-    if (!selectedAddress) return alert("Select a delivery address");
-    if (!deliveryDate) return alert("Select a delivery date");
-    if (!paymentMode) return alert("Select a payment method");
+    if (!selectedAddress) {
+      showAlert("Select a delivery address", "error");
+      return;
+    }
+    if (!paymentMode) {
+      showAlert("Select a payment method", "error");
+      return;
+    }
 
     if (paymentMode === "RAZORPAY") {
       startPayment();
@@ -208,14 +218,8 @@ const startPayment = async () => {
 
     try {
       const payload = {
-        userId,
         addressId: selectedAddress,
-        deliveryDate,
-        paymentMode,
-        items: cart.map(i => ({
-          productId: i.productId,
-          quantity: i.quantity
-        }))
+        paymentMethod:"COD"
       };
 
       await axios.post(
@@ -224,11 +228,11 @@ const startPayment = async () => {
         authHeader()
       );
 
-      alert("Order placed successfully!");
-      navigate("/orders");
+      showAlert("Order placed successfully!", "success");
+      setTimeout(() => navigate("/orders"), 1500);
     } catch (err) {
       console.error(err);
-      alert("Order failed");
+      showAlert("Order failed", "error");
     } finally {
       setPlacingOrder(false);
     }
@@ -328,38 +332,23 @@ const startPayment = async () => {
                     <Calendar className="section-icon-pro" size={24} />
                   </div>
                   <div>
-                    <h2 className="section-title-pro">Delivery Date</h2>
+                    <h2 className="section-title-pro">Estimated Delivery</h2>
                     <p className="section-subtitle-pro">
-                      Choose your preferred delivery date
+                      Your order will be delivered within 7 days
                     </p>
                   </div>
                 </div>
 
                 <div className="delivery-dates-pro">
-                  {getDeliveryDates().map((date, index) => (
-                    <div
-                      key={date.value}
-                      className={`delivery-option-pro ${
-                        deliveryDate === date.value ? "selected" : ""
-                      } ${date.isExpress ? "express" : ""}`}
-                      onClick={() => setDeliveryDate(date.value)}
-                      style={{ '--delay': `${index * 0.05}s` }}
-                    >
-                      <div className="date-radio-pro">
-                        <div
-                          className={`radio-dot-pro ${
-                            deliveryDate === date.value ? "active" : ""
-                          }`}
-                        ></div>
-                      </div>
-                      <div className="date-content-pro">
-                        <span className="date-label-pro">{date.label}</span>
-                        {date.isExpress && (
-                          <span className="express-badge-pro">Express</span>
-                        )}
-                      </div>
+                  <div className="delivery-option-pro selected">
+                    <div className="date-radio-pro">
+                      <div className="radio-dot-pro active"></div>
                     </div>
-                  ))}
+                    <div className="date-content-pro">
+                      <span className="date-label-pro">{formatDeliveryDate()}</span>
+                      <span className="express-badge-pro">Standard Delivery</span>
+                    </div>
+                  </div>
                 </div>
               </section>
 
@@ -544,6 +533,13 @@ const startPayment = async () => {
         </div>
       </div>
       </div>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </>
   );
 }

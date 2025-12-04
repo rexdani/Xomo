@@ -1,7 +1,8 @@
 import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Mail, Lock, ArrowRight, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import AlertModal from "../components/AlertModal";
 import "../styles/login.css";
 import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
@@ -13,7 +14,16 @@ export default function LoginPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
   const navigate = useNavigate();
+
+  const showAlert = (message, type = "error") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "error" });
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -21,7 +31,7 @@ export default function LoginPage() {
 
   const loginUser = async () => {
     if (!form.email || !form.password) {
-      alert("Please fill in all fields");
+      showAlert("Please fill in all fields");
       return;
     }
 
@@ -40,7 +50,7 @@ export default function LoginPage() {
       navigate("/HomePage", { replace: true });
 
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed. Please check your credentials.");
+      showAlert(err.response?.data?.message || "Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
@@ -52,20 +62,26 @@ export default function LoginPage() {
     }
   };
   const handleGoogleLogin = (response) => {
-  const idToken = response.credential;
+    const idToken = response.credential;
+    
+    // Show loading screen
+    setIsLoading(true);
 
-  // Send Google ID Token → Spring Boot
-  axios.post(`${BASE_URL}/auth/google`, { idToken })
-    .then((res) => {
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("userId", res.data.userId);
+    // Send Google ID Token → Spring Boot
+    axios.post(`${BASE_URL}/auth/google`, { idToken })
+      .then((res) => {
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("userId", res.data.userId);
 
-      navigate("/HomePage", { replace: true });
-    })
-    .catch(() => {
-      alert("Google login failed");
-    });
-};
+        navigate("/HomePage", { replace: true });
+      })
+      .catch(() => {
+        showAlert("Google login failed");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 useEffect(() => {
   if (window.google) {
     google.accounts.id.initialize({
@@ -173,6 +189,13 @@ useEffect(() => {
           </p>
         </div>
       </div>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </div>
   );
 }

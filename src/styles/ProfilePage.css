@@ -56,19 +56,24 @@
   box-shadow: var(--shadow-md);
 }
 
+.header-content-pro {
+  text-align: center;
+  margin-top: 2rem;
+}
+
 .page-title-pro {
   font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 900;
   line-height: 1.1;
   margin-bottom: 0.75rem;
-  color: var(--text-primary);
+  color: #1a1a2e !important;
   letter-spacing: -2px;
   animation: fadeInUp 0.8s var(--ease-out-expo);
 }
 
 .page-subtitle-pro {
   font-size: 1.2rem;
-  color: var(--text-secondary);
+  color: #64748b !important;
   line-height: 1.7;
   animation: fadeInUp 0.8s var(--ease-out-expo) 0.2s backwards;
 }

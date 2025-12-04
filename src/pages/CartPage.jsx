@@ -14,6 +14,7 @@ import {
   RotateCcw
 } from "lucide-react";
 import Header from "../components/Header";
+import AlertModal from "../components/AlertModal";
 import "../styles/cart.css";
 import "../styles/shared.css";
 import { BASE_URL } from "../util/config.js";
@@ -25,7 +26,16 @@ export default function CartPage() {
   const [coupon, setCoupon] = useState("");
   const [discountAmt, setDiscountAmt] = useState(0);
   const [processing, setProcessing] = useState(false);
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
   const navigate = useNavigate();
+
+  const showAlert = (message, type = "error") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "error" });
+  };
 
   useEffect(() => {
     const uid = localStorage.getItem("userId");
@@ -147,7 +157,10 @@ const formatted = items.map((it) => {
   };
 
   const applyCoupon = async () => {
-    if (!coupon.trim()) return alert("Enter coupon code");
+    if (!coupon.trim()) {
+      showAlert("Enter coupon code", "error");
+      return;
+    }
     try {
       const res = await axios.post(
         `${BASE_URL}/cart/apply-coupon`,
@@ -155,10 +168,10 @@ const formatted = items.map((it) => {
         authHeader()
       );
       setDiscountAmt(res.data.discountAmount || 0);
-      alert("Coupon applied successfully!");
+      showAlert("Coupon applied successfully!", "success");
     } catch (err) {
       console.error("Coupon failed", err);
-      alert(err.response?.data?.message || "Invalid coupon code");
+      showAlert(err.response?.data?.message || "Invalid coupon code", "error");
     }
   };
 
@@ -168,18 +181,21 @@ const formatted = items.map((it) => {
 
   const checkout = async () => {
     if (!userId) {
-      alert("Please login to checkout");
-      navigate("/");
+      showAlert("Please login to checkout", "error");
+      setTimeout(() => navigate("/"), 1500);
       return;
     }
-    if (items.length === 0) return alert("Cart is empty");
+    if (items.length === 0) {
+      showAlert("Cart is empty", "error");
+      return;
+    }
     
     setProcessing(true);
     try {
       navigate('/checkout');
     } catch (err) {
       console.error("Checkout failed", err);
-      alert(err.response?.data?.message || "Checkout failed. Please try again.");
+      showAlert(err.response?.data?.message || "Checkout failed. Please try again.", "error");
     } finally {
       setProcessing(false);
     }
@@ -428,6 +444,13 @@ const formatted = items.map((it) => {
         </div>
       )}
       </div>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </>
   );
 }

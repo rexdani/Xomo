@@ -14,6 +14,7 @@ import CategoriesPage from "./pages/CategoriesPage";
 import NewArrivalsPage from "./pages/NewArrivalsPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import ContactPage from "./pages/ContactPage";
+import WishlistPage from "./pages/WishlistPage";
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
         <Route path="/new-arrivals" element={<NewArrivalsPage/>}/>
         <Route path="/collections" element={<CollectionsPage/>}/>
         <Route path="/contact" element={<ContactPage/>}/>
+        <Route path="/wishlist" element={<WishlistPage/>}/>
 
 
 

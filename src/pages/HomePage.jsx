@@ -1,16 +1,19 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { 
   Menu, ShoppingCart, Search, User, X, ChevronRight, Star, 
   Truck, Shield, RotateCcw, ChevronLeft, Sparkles, TrendingUp,
   Award, Heart, ArrowRight, Play
 } from "lucide-react";
+import AlertModal from "../components/AlertModal";
 import "../styles/home.css";
 import { BASE_URL } from "../util/config.js";
 
 export default function HomePage() {
   const [categories, setCategories] = useState([]);
   const [ads, setAds] = useState([]);
+  const [newArrivals, setNewArrivals] = useState([]);
   const [cartCount, setCartCount] = useState(0);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
@@ -19,9 +22,19 @@ export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [visibleSections, setVisibleSections] = useState(new Set());
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
   const heroRef = useRef(null);
   const carouselIntervalRef = useRef(null);
   const parallaxRef = useRef(null);
+  const navigate = useNavigate();
+
+  const showAlert = (message, type = "error") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "error" });
+  };
 
   // Scroll detection for header and parallax
   useEffect(() => {
@@ -147,7 +160,8 @@ export default function HomePage() {
       await Promise.allSettled([
         loadAds(),
         loadCategories(),
-        loadCartCount()
+        loadCartCount(),
+        loadNewArrivals()
       ]);
     } catch (err) {
       console.error("Error loading initial data", err);
@@ -219,6 +233,96 @@ export default function HomePage() {
     }
   };
 
+  const loadNewArrivals = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setNewArrivals([]);
+        return;
+      }
+
+      const authHeader = { headers: { Authorization: `Bearer ${token}` } };
+      
+      let productsData = [];
+      
+      try {
+        // Try new arrivals endpoint
+        const response = await axios.get(
+          `${BASE_URL}/products/new-arrivals`,
+          authHeader
+        );
+        productsData = response.data || [];
+      } catch (error) {
+        console.log("New arrivals endpoint failed, trying all products...");
+        try {
+          // Fallback to all products and sort by date
+          const response = await axios.get(
+            `${BASE_URL}/products`,
+            authHeader
+          );
+          productsData = response.data || [];
+          productsData.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+          productsData = productsData.slice(0, 4); // Limit to 4 for homepage
+        } catch (error2) {
+          console.error("Error loading new arrivals", error2);
+          productsData = [];
+        }
+      }
+
+      const formattedProducts = (Array.isArray(productsData) ? productsData : [productsData])
+        .slice(0, 4) // Show only 4 on homepage
+        .map((product) => ({
+          id: product.id || `product-${Math.random()}`,
+          name: product.name || "New Arrival",
+          description: product.description || "Premium quality product",
+          price: Number(product.price) || 0,
+          originalPrice: Number(product.originalPrice) || null,
+          rating: Number(product.rating) || 4.5,
+          reviews: Number(product.reviews) || 0,
+          category: product.category || "Fashion",
+          imageUrl: product.imageBase64 
+            ? `data:image/jpeg;base64,${product.imageBase64}`
+            : product.image
+            ? `data:image/jpeg;base64,${product.image}`
+            : "/placeholder-product.jpg",
+          stock: Number(product.stock) || 10
+        }));
+
+      setNewArrivals(formattedProducts);
+    } catch (error) {
+      console.error("Error loading new arrivals", error);
+      setNewArrivals([]);
+    }
+  };
+
+  const addToCart = async (productId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      if (!token || !userId) {
+        showAlert("Please login to add items to cart", "error");
+        return;
+      }
+
+      await axios.post(
+        `${BASE_URL}/cart/add`,
+        { 
+          userId: String(userId), 
+          productId: String(productId), 
+          quantity: 1 
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      showAlert("Product added to cart!", "success");
+      loadCartCount(); // Refresh cart count
+    } catch (err) {
+      console.error("Cart error:", err);
+      showAlert("Failed to add to cart. Please try again.", "error");
+    }
+  };
+
   const nextAd = useCallback(() => {
     setCurrentAdIndex((prev) => (prev + 1) % ads.length);
     if (carouselIntervalRef.current) {
@@ -276,8 +380,13 @@ export default function HomePage() {
         <div className="header-inner">
           <div className="brand">
             <a href="/HomePage" className="logo">
-              <span className="logo-text">XOMO</span>
-              <span className="logo-accent"></span>
+              <div className="logo-icon">
+                <span className="logo-x">X</span>
+              </div>
+              <div className="logo-wordmark">
+                <span className="logo-text">XOMO</span>
+                <span className="logo-tagline">FASHION</span>
+              </div>
             </a>
           </div>
 
@@ -303,6 +412,9 @@ export default function HomePage() {
             <button className="action-btn search-btn" aria-label="Search">
               <Search size={20} />
             </button>
+            <a href="/wishlist" className="action-btn wishlist-btn" aria-label="Wishlist">
+              <Heart size={20} />
+            </a>
             <a href="/profile" className="action-btn user-btn" aria-label="Profile">
               <User size={20} />
             </a>
@@ -342,6 +454,19 @@ export default function HomePage() {
             </a>
             <a href="/contact" className="mobile-nav-link" onClick={() => setMobileMenu(false)}>
               Contact
+            </a>
+            <div className="mobile-nav-divider"></div>
+            <a href="/profile" className="mobile-nav-link" onClick={() => setMobileMenu(false)}>
+              My Profile
+            </a>
+            <a href="/wishlist" className="mobile-nav-link" onClick={() => setMobileMenu(false)}>
+              Wishlist
+            </a>
+            <a href="/orders" className="mobile-nav-link" onClick={() => setMobileMenu(false)}>
+              My Orders
+            </a>
+            <a href="/cart" className="mobile-nav-link" onClick={() => setMobileMenu(false)}>
+              Cart {cartCount > 0 && `(${cartCount})`}
             </a>
           </div>
         </div>
@@ -695,42 +820,124 @@ export default function HomePage() {
           </div>
 
           <div className="products-grid-pro">
-            {[1, 2, 3].map((item, idx) => (
-              <div key={idx} className="product-card-pro" data-animate style={{ '--delay': `${idx * 0.1}s` }}>
-                <div className="product-image-wrapper-pro">
-                  <div className="product-image-placeholder-pro">
-                    <Sparkles size={32} />
+            {newArrivals.length > 0 ? (
+              newArrivals.map((product, idx) => (
+                <div 
+                  key={product.id} 
+                  className="product-card-pro" 
+                  data-animate 
+                  style={{ '--delay': `${idx * 0.1}s` }}
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
+                  <div className="product-image-wrapper-pro">
+                    <img 
+                      src={product.imageUrl} 
+                      alt={product.name}
+                      className="product-image-pro"
+                      onError={(e) => {
+                        e.target.src = "/placeholder-product.jpg";
+                      }}
+                    />
+                    <div className="product-actions-pro">
+                      <button 
+                        className="product-action-btn-pro" 
+                        aria-label="Add to wishlist"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Add wishlist functionality here if needed
+                        }}
+                      >
+                        <Heart size={18} />
+                      </button>
+                      <button 
+                        className="product-action-btn-pro" 
+                        aria-label="Quick view"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/product/${product.id}`);
+                        }}
+                      >
+                        <Search size={18} />
+                      </button>
+                    </div>
+                    <div className="product-badge-pro">
+                      <span>New</span>
+                    </div>
+                    <div className="product-hover-overlay"></div>
                   </div>
-                  <div className="product-actions-pro">
-                    <button className="product-action-btn-pro" aria-label="Add to wishlist">
-                      <Heart size={18} />
+                  <div className="product-info-pro">
+                    <h3 className="product-name-pro">{product.name}</h3>
+                    <div className="product-rating-pro">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          size={14} 
+                          className="star-icon-pro" 
+                          fill={i < Math.floor(product.rating) ? "#fbbf24" : "none"}
+                          color="#fbbf24"
+                        />
+                      ))}
+                      <span className="rating-text-pro">({product.rating})</span>
+                    </div>
+                    <div className="product-price-pro">
+                      <span className="price-current-pro">
+                        ₹{product.price.toLocaleString()}
+                      </span>
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <span className="price-original-pro">
+                          ₹{product.originalPrice.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                    <button 
+                      className="add-to-cart-btn-pro"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(product.id);
+                      }}
+                      disabled={product.stock <= 0}
+                    >
+                      <ShoppingCart size={16} />
+                      {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
                     </button>
-                    <button className="product-action-btn-pro" aria-label="Quick view">
-                      <Search size={18} />
-                    </button>
-                  </div>
-                  <div className="product-badge-pro">
-                    <span>New</span>
-                  </div>
-                  <div className="product-hover-overlay"></div>
-                </div>
-                <div className="product-info-pro">
-                  <h3 className="product-name-pro">Premium Product {idx + 1}</h3>
-                  <div className="product-rating-pro">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="star-icon-pro" fill="#fbbf24" />
-                    ))}
-                    <span className="rating-text-pro">(4.8)</span>
-                  </div>
-                  <div className="product-price-pro">
-                    <span className="price-current-pro">₹{1999 + idx * 500}</span>
-                    {idx === 0 && (
-                      <span className="price-original-pro">₹2,499</span>
-                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              [1, 2, 3, 4].map((item, idx) => (
+                <div key={idx} className="product-card-pro" data-animate style={{ '--delay': `${idx * 0.1}s` }}>
+                  <div className="product-image-wrapper-pro">
+                    <div className="product-image-placeholder-pro">
+                      <Sparkles size={32} />
+                    </div>
+                    <div className="product-actions-pro">
+                      <button className="product-action-btn-pro" aria-label="Add to wishlist">
+                        <Heart size={18} />
+                      </button>
+                      <button className="product-action-btn-pro" aria-label="Quick view">
+                        <Search size={18} />
+                      </button>
+                    </div>
+                    <div className="product-badge-pro">
+                      <span>New</span>
+                    </div>
+                    <div className="product-hover-overlay"></div>
+                  </div>
+                  <div className="product-info-pro">
+                    <h3 className="product-name-pro">Loading...</h3>
+                    <div className="product-rating-pro">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={14} className="star-icon-pro" fill="#fbbf24" />
+                      ))}
+                      <span className="rating-text-pro">(4.8)</span>
+                    </div>
+                    <div className="product-price-pro">
+                      <span className="price-current-pro">₹0</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
       </main>
@@ -795,6 +1002,13 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </div>
   );
 }

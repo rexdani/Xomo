@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../util/config.js";
 import Header from "../components/Header";
+import AlertModal from "../components/AlertModal";
 import "../styles/addressbook.css";
+import "../styles/shared.css";
 import { Edit, Trash2, Plus, MapPin, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -20,8 +22,17 @@ export default function AddressBook() {
 
   const [showForm, setShowForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
 
   const navigate = useNavigate();
+
+  const showAlert = (message, type = "error") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "error" });
+  };
 
   const token = localStorage.getItem("token");
   const authHeader = {
@@ -76,7 +87,7 @@ export default function AddressBook() {
       loadAddresses();
     } catch (err) {
       console.error("Failed to save address", err);
-      alert("Error saving address");
+      showAlert("Error saving address", "error");
     }
   };
 
@@ -96,25 +107,29 @@ export default function AddressBook() {
     <>
       <Header />
       <div className="addressbook-page">
-        <div className="products-header">
-          <div className="container">
-            <button className="back-btn" onClick={() => navigate(-1)}>
-              <ArrowLeft size={18} />
-              Back
+        <div className="addressbook-header-pro">
+          <div className="shared-container">
+            <button className="back-btn-pro" onClick={() => navigate(-1)}>
+              <ArrowLeft size={20} />
+              <span>Back</span>
             </button>
+            <div className="header-content-pro">
+              <h1 className="page-title-pro">Address Book</h1>
+              <p className="page-subtitle-pro">Manage your delivery addresses</p>
+            </div>
           </div>
         </div>
 
       <div className="address-page">
-        <div className="address-header">
-          <h2>Address Book</h2>
-          <button className="add-btn" onClick={openAddForm}>
-            <Plus size={18} /> Add New Address
-          </button>
-        </div>
+        <div className="shared-container">
+          <div className="address-header">
+            <button className="add-btn" onClick={openAddForm}>
+              <Plus size={18} /> Add New Address
+            </button>
+          </div>
 
-        {/* Address List */}
-        <div className="address-list">
+          {/* Address List */}
+          <div className="address-list">
           {addresses.length === 0 ? (
             <p>No address added yet.</p>
           ) : (
@@ -144,6 +159,7 @@ export default function AddressBook() {
               </div>
             ))
           )}
+          </div>
         </div>
 
         {/* Modal Form */}
@@ -210,6 +226,13 @@ export default function AddressBook() {
         )}
       </div>
       </div>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </>
   );
 }

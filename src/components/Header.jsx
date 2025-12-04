@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Menu, ShoppingCart, Search, User, X } from "lucide-react";
+import { Menu, ShoppingCart, Search, User, X, Heart } from "lucide-react";
 import axios from "axios";
 import "../styles/header.css";
 import { BASE_URL } from "../util/config.js";
@@ -22,10 +22,10 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Load cart count
+  // Load cart count on mount and route change
   useEffect(() => {
     loadCartCount();
-  }, []);
+  }, [location]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -40,13 +40,11 @@ export default function Header() {
       if (!token || !userId) return;
 
       const response = await axios.get(
-        `${BASE_URL}/cart/${userId}`,
+        `${BASE_URL}/cart/count/${userId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const items = response.data || [];
-      const count = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
-      setCartCount(count);
+      setCartCount(response.data || 0);
     } catch (error) {
       console.log("Could not load cart count");
     }
@@ -65,8 +63,13 @@ export default function Header() {
         <div className="header-inner">
           <div className="brand">
             <a href="/HomePage" className="logo">
-              <span className="logo-text">XOMO</span>
-              <span className="logo-accent"></span>
+              <div className="logo-icon">
+                <span className="logo-x">X</span>
+              </div>
+              <div className="logo-wordmark">
+                <span className="logo-text">XOMO</span>
+                <span className="logo-tagline">FASHION</span>
+              </div>
             </a>
           </div>
 
@@ -92,6 +95,9 @@ export default function Header() {
             <button className="action-btn search-btn" aria-label="Search">
               <Search size={20} />
             </button>
+            <a href="/wishlist" className={`action-btn wishlist-btn ${isActive('/wishlist') ? 'active' : ''}`} aria-label="Wishlist">
+              <Heart size={20} />
+            </a>
             <a href="/profile" className={`action-btn user-btn ${isActive('/profile') ? 'active' : ''}`} aria-label="Profile">
               <User size={20} />
             </a>
@@ -135,6 +141,9 @@ export default function Header() {
             <div className="mobile-nav-divider"></div>
             <a href="/profile" className={`mobile-nav-link ${isActive('/profile') ? 'active' : ''}`} onClick={() => setMobileMenu(false)}>
               My Profile
+            </a>
+            <a href="/wishlist" className={`mobile-nav-link ${isActive('/wishlist') ? 'active' : ''}`} onClick={() => setMobileMenu(false)}>
+              Wishlist
             </a>
             <a href="/orders" className={`mobile-nav-link ${isActive('/orders') ? 'active' : ''}`} onClick={() => setMobileMenu(false)}>
               My Orders

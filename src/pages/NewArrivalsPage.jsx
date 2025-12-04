@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { ShoppingCart, Heart, Star, Clock, TrendingUp, Filter, Grid, List } from "lucide-react";
 import Header from "../components/Header";
+import AlertModal from "../components/AlertModal";
 import "../styles/newArrivals.css";
+import { BASE_URL } from "../util/config.js";
 
 const host = window.location.hostname;
 const backendPort = 8081;
@@ -15,6 +17,15 @@ export default function NewArrivalsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [categories, setCategories] = useState([]);
+  const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "success" });
+
+  const showAlert = (message, type = "success") => {
+    setAlertModal({ show: true, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertModal({ show: false, message: "", type: "success" });
+  };
 
   useEffect(() => {
     loadNewArrivals();
@@ -45,7 +56,7 @@ export default function NewArrivalsPage() {
       try {
         // Try specific new arrivals endpoint
         const response = await axios.get(
-          `http://${host}:${backendPort}/products/new-arrivals`,
+          `${BASE_URL}/products/new-arrivals`,
           authHeader
         );
         productsData = response.data || [];
@@ -55,7 +66,7 @@ export default function NewArrivalsPage() {
         try {
           // Fallback to all products and filter by date
           const response = await axios.get(
-            `http://${host}:${backendPort}/products`,
+            `${BASE_URL}/products`,
             authHeader
           );
           productsData = response.data || [];
@@ -172,7 +183,7 @@ export default function NewArrivalsPage() {
 
   const addToCart = (product) => {
     console.log("Added to cart:", product);
-    alert(`${product.name} added to cart!`);
+    showAlert(`${product.name} added to cart!`, "success");
   };
 
   const formatPrice = (price) => {
@@ -475,6 +486,13 @@ export default function NewArrivalsPage() {
         </div>
       </section>
       </div>
+
+      <AlertModal
+        show={alertModal.show}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={closeAlert}
+      />
     </>
   );
 }
