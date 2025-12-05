@@ -62,26 +62,26 @@ export default function LoginPage() {
     }
   };
   const handleGoogleLogin = (response) => {
-    const idToken = response.credential;
+  const idToken = response.credential;
     
     // Show loading screen
     setIsLoading(true);
 
-    // Send Google ID Token → Spring Boot
-    axios.post(`${BASE_URL}/auth/google`, { idToken })
-      .then((res) => {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("userId", res.data.userId);
+  // Send Google ID Token → Spring Boot
+  axios.post(`${BASE_URL}/auth/google`, { idToken })
+    .then((res) => {
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("userId", res.data.userId);
 
-        navigate("/HomePage", { replace: true });
-      })
-      .catch(() => {
+      navigate("/HomePage", { replace: true });
+    })
+    .catch(() => {
         showAlert("Google login failed");
       })
       .finally(() => {
         setIsLoading(false);
-      });
-  };
+    });
+};
 useEffect(() => {
   if (window.google) {
     google.accounts.id.initialize({

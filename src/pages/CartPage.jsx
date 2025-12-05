@@ -237,7 +237,7 @@ const formatted = items.map((it) => {
           <h2 className="shared-empty-title">Your cart is empty</h2>
           <p className="shared-empty-message">Discover our premium collection and find something you love</p>
           <div className="empty-actions-pro">
-            <button className="shared-btn shared-btn-primary" onClick={() => navigate('/')}>
+            <button className="shared-btn shared-btn-primary" onClick={() => navigate('/categories')}>
               Start Shopping
             </button>
             <button className="shared-btn shared-btn-secondary" onClick={() => navigate('/categories')}>

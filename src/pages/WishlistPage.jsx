@@ -92,7 +92,7 @@ export default function WishlistPage() {
 
   const removeFromWishlist = async (wishlistItemId) => {
     try {
-      await axios.delete(`${BASE_URL}/wishlist/${wishlistItemId}`, authHeader());
+      await axios.delete(`${BASE_URL}/wishlist/remove/${wishlistItemId}`, authHeader());
       setWishlistItems((prev) => prev.filter((item) => item.id !== wishlistItemId));
       showAlert("Removed from wishlist", "success");
     } catch (err) {

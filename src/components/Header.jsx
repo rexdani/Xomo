@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Menu, ShoppingCart, Search, User, X, Heart } from "lucide-react";
 import axios from "axios";
+import SearchModal from "./SearchModal";
 import "../styles/header.css";
 import { BASE_URL } from "../util/config.js";
 
@@ -9,6 +10,7 @@ export default function Header() {
   const [cartCount, setCartCount] = useState(0);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const location = useLocation();
 
   // Scroll detection for header
@@ -67,7 +69,7 @@ export default function Header() {
                 <span className="logo-x">X</span>
               </div>
               <div className="logo-wordmark">
-                <span className="logo-text">XOMO</span>
+              <span className="logo-text">XOMO</span>
                 <span className="logo-tagline">FASHION</span>
               </div>
             </a>
@@ -92,7 +94,11 @@ export default function Header() {
           </nav>
 
           <div className="header-actions">
-            <button className="action-btn search-btn" aria-label="Search">
+            <button 
+              className="action-btn search-btn" 
+              aria-label="Search"
+              onClick={() => setShowSearchModal(true)}
+            >
               <Search size={20} />
             </button>
             <a href="/wishlist" className={`action-btn wishlist-btn ${isActive('/wishlist') ? 'active' : ''}`} aria-label="Wishlist">
@@ -159,6 +165,12 @@ export default function Header() {
       {mobileMenu && (
         <div className="mobile-overlay" onClick={() => setMobileMenu(false)}></div>
       )}
+
+      {/* Search Modal */}
+      <SearchModal 
+        show={showSearchModal} 
+        onClose={() => setShowSearchModal(false)} 
+      />
     </>
   );
 }

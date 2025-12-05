@@ -223,10 +223,10 @@ export default function ProfilePage() {
               <ArrowLeft size={20} />
               <span>Back</span>
             </button>
-            
+      
             <div className="header-content-pro">
-              <h1 className="page-title-pro">My Account</h1>
-              <p className="page-subtitle-pro">Manage your profile and preferences</p>
+            <h1 className="page-title-pro">My Account</h1>
+            <p className="page-subtitle-pro">Manage your profile and preferences</p>
             </div>
           </div>
         </div>

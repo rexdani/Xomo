@@ -187,6 +187,32 @@ export default function ProductDetails() {
       showAlert("Failed to add to cart. Please try again.", "error");
     }
   };
+  const buyNow = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      if (!token || !userId) {
+        showAlert("Please login to add items to cart", "error");
+        return;
+      }
+
+      await axios.post(
+        `${BASE_URL}/cart/add`,
+        { 
+          userId: String(userId), 
+          productId: String(product.id), 
+          quantity: 1 
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      navigate("/cart");
+    } catch (err) {
+      console.error("Cart error:", err);
+      showAlert("Failed to add to cart. Please try again.", "error");
+    }
+  };
 
   const navigateToProduct = (productId) => {
     if (productId.startsWith('similar-')) {
@@ -375,6 +401,7 @@ export default function ProductDetails() {
 
                 <button 
                   className="buy-now-large"
+                  onClick={buyNow}
                   disabled={product.stock <= 0}
                 >
                   Buy Now

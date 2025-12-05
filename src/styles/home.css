@@ -2375,6 +2375,15 @@
   transform: scale(1.1);
 }
 
+.product-action-btn-pro.wishlist-active {
+  color: #ef4444;
+}
+
+.product-action-btn-pro.wishlist-active:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
 .product-badge-pro {
   position: absolute;
   top: 1rem;

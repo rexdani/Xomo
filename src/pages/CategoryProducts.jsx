@@ -19,6 +19,7 @@ export default function CategoryProducts() {
   const [sortBy, setSortBy] = useState("name");
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
   const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
+  const [wishlistItems, setWishlistItems] = useState([]); // Track wishlist items
 
   const showAlert = (message, type = "error") => {
     setAlertModal({ show: true, message, type });
@@ -30,6 +31,7 @@ export default function CategoryProducts() {
 
   useEffect(() => {
     loadProductsByCategory();
+    loadWishlist();
   }, [id]);
 
   const loadProductsByCategory = async () => {
@@ -113,6 +115,30 @@ export default function CategoryProducts() {
     }
   };
 
+  const loadWishlist = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const authHeader = { headers: { Authorization: `Bearer ${token}` } };
+      const res = await axios.get(`${BASE_URL}/wishlist`, authHeader);
+      
+      const items = res.data?.items || [];
+      const productIds = items
+        .filter(item => item && item.product)
+        .map(item => String(item.product.id || item.product.productId));
+      
+      setWishlistItems(productIds);
+    } catch (err) {
+      console.error("Failed to load wishlist", err);
+      setWishlistItems([]);
+    }
+  };
+
+  const isInWishlist = (productId) => {
+    return wishlistItems.includes(String(productId));
+  };
+
   const addToWishlist = async (product) => {
     try {
       const token = localStorage.getItem("token");
@@ -123,21 +149,48 @@ export default function CategoryProducts() {
         return;
       }
 
-      await axios.post(
-        `${BASE_URL}/wishlist/add`,
-        { 
-          productId:(product.id)
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const productId = String(product.id);
+      const isInWishlist = wishlistItems.includes(productId);
 
-      showAlert("Product added to wishlist!", "success");
+      if (isInWishlist) {
+        // Remove from wishlist
+        const wishlistItem = await axios.get(`${BASE_URL}/wishlist`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const items = wishlistItem.data?.items || [];
+        const itemToRemove = items.find(
+          item => String(item.product?.id || item.product?.productId) === productId
+        );
+        
+        if (itemToRemove) {
+          await axios.delete(
+            `${BASE_URL}/wishlist/${itemToRemove.id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setWishlistItems(prev => prev.filter(id => id !== productId));
+          showAlert("Removed from wishlist", "success");
+        }
+      } else {
+        // Add to wishlist
+        await axios.post(
+          `${BASE_URL}/wishlist/add`,
+          { productId: product.id },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setWishlistItems(prev => [...prev, productId]);
+        showAlert("Product added to wishlist!", "success");
+      }
     } catch (err) {
       console.error("Wishlist error:", err);
       if (err.response?.status === 409) {
         showAlert("Product already in wishlist", "info");
+        // Still update UI if it's already in wishlist
+        const productId = String(product.id);
+        if (!wishlistItems.includes(productId)) {
+          setWishlistItems(prev => [...prev, productId]);
+        }
       } else {
-        showAlert("Failed to add to wishlist. Please try again.", "error");
+        showAlert("Failed to update wishlist. Please try again.", "error");
       }
     }
   };
@@ -234,32 +287,38 @@ export default function CategoryProducts() {
           <div className={`products-container ${viewMode}`}>
             {sortedProducts.map((product) => (
               <div 
-                className="product-card" 
-                key={product.id}
-              > 
+  className="product-card" 
+  key={product.id}
+> 
                 <div className="product-media">
                   <Link to={`/product/${product.id}`} className="product-image-link">
-                    <img 
-                      src={product.imageUrl} 
-                      alt={product.name}
-                      className="product-image"
+                  <img 
+                    src={product.imageUrl} 
+                    alt={product.name}
+                    className="product-image"
                       onError={(e) => {
                         e.target.src = "/placeholder-product.jpg";
                       }}
-                    />
+                  />
                   </Link>
                   
                   <div className="product-actions">
                     <button 
-                      className="action-btn wishlist"
+                      className={`action-btn wishlist ${isInWishlist(product.id) ? 'active' : ''}`}
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         addToWishlist(product);
                       }}
-                      aria-label="Add to wishlist"
+                      aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
+                      title={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
                     >
-                      <Heart size={16} />
+                      <Heart 
+                        size={28} 
+                        fill={isInWishlist(product.id) ? "#ef4444" : "none"}
+                        color={isInWishlist(product.id) ? "#ef4444" : "#6b7280"}
+                        strokeWidth={isInWishlist(product.id) ? 3 : 2.5}
+                      />
                     </button>
                     {product.discount > 0 && (
                       <div className="discount-badge">-{product.discount}%</div>
@@ -285,7 +344,7 @@ export default function CategoryProducts() {
 
                 <div className="product-info">
                   <Link to={`/product/${product.id}`} className="product-name-link">
-                    <h3 className="product-name">{product.name}</h3>
+                  <h3 className="product-name">{product.name}</h3>
                   </Link>
                   
                   <div className="product-meta">

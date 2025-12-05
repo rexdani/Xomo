@@ -7,6 +7,7 @@ import {
   Award, Heart, ArrowRight, Play
 } from "lucide-react";
 import AlertModal from "../components/AlertModal";
+import SearchModal from "../components/SearchModal";
 import "../styles/home.css";
 import { BASE_URL } from "../util/config.js";
 
@@ -23,6 +24,8 @@ export default function HomePage() {
   const [visibleSections, setVisibleSections] = useState(new Set());
   const [scrollProgress, setScrollProgress] = useState(0);
   const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
+  const [wishlistItems, setWishlistItems] = useState([]); // Track wishlist items
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const heroRef = useRef(null);
   const carouselIntervalRef = useRef(null);
   const parallaxRef = useRef(null);
@@ -161,7 +164,8 @@ export default function HomePage() {
         loadAds(),
         loadCategories(),
         loadCartCount(),
-        loadNewArrivals()
+        loadNewArrivals(),
+        loadWishlist()
       ]);
     } catch (err) {
       console.error("Error loading initial data", err);
@@ -295,6 +299,30 @@ export default function HomePage() {
     }
   };
 
+  const loadWishlist = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const authHeader = { headers: { Authorization: `Bearer ${token}` } };
+      const res = await axios.get(`${BASE_URL}/wishlist`, authHeader);
+      
+      const items = res.data?.items || [];
+      const productIds = items
+        .filter(item => item && item.product)
+        .map(item => String(item.product.id || item.product.productId));
+      
+      setWishlistItems(productIds);
+    } catch (err) {
+      console.error("Failed to load wishlist", err);
+      setWishlistItems([]);
+    }
+  };
+
+  const isInWishlist = (productId) => {
+    return wishlistItems.includes(String(productId));
+  };
+
   const addToCart = async (productId) => {
     try {
       const token = localStorage.getItem("token");
@@ -320,6 +348,61 @@ export default function HomePage() {
     } catch (err) {
       console.error("Cart error:", err);
       showAlert("Failed to add to cart. Please try again.", "error");
+    }
+  };
+
+  const addToWishlist = async (product) => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      if (!token || !userId) {
+        showAlert("Please login to add items to wishlist", "error");
+        return;
+      }
+
+      const productId = String(product.id);
+      const isInWishlist = wishlistItems.includes(productId);
+
+      if (isInWishlist) {
+        // Remove from wishlist
+        const wishlistItem = await axios.get(`${BASE_URL}/wishlist`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const items = wishlistItem.data?.items || [];
+        const itemToRemove = items.find(
+          item => String(item.product?.id || item.product?.productId) === productId
+        );
+        
+        if (itemToRemove) {
+          await axios.delete(
+            `${BASE_URL}/wishlist/${itemToRemove.id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setWishlistItems(prev => prev.filter(id => id !== productId));
+          showAlert("Removed from wishlist", "success");
+        }
+      } else {
+        // Add to wishlist
+        await axios.post(
+          `${BASE_URL}/wishlist/add`,
+          { productId: product.id },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setWishlistItems(prev => [...prev, productId]);
+        showAlert("Product added to wishlist!", "success");
+      }
+    } catch (err) {
+      console.error("Wishlist error:", err);
+      if (err.response?.status === 409) {
+        showAlert("Product already in wishlist", "info");
+        const productId = String(product.id);
+        if (!wishlistItems.includes(productId)) {
+          setWishlistItems(prev => [...prev, productId]);
+        }
+      } else {
+        showAlert("Failed to update wishlist. Please try again.", "error");
+      }
     }
   };
 
@@ -384,7 +467,7 @@ export default function HomePage() {
                 <span className="logo-x">X</span>
               </div>
               <div className="logo-wordmark">
-                <span className="logo-text">XOMO</span>
+              <span className="logo-text">XOMO</span>
                 <span className="logo-tagline">FASHION</span>
               </div>
             </a>
@@ -409,7 +492,11 @@ export default function HomePage() {
           </nav>
 
           <div className="header-actions">
-            <button className="action-btn search-btn" aria-label="Search">
+            <button 
+              className="action-btn search-btn" 
+              aria-label="Search"
+              onClick={() => setShowSearchModal(true)}
+            >
               <Search size={20} />
             </button>
             <a href="/wishlist" className="action-btn wishlist-btn" aria-label="Wishlist">
@@ -840,14 +927,18 @@ export default function HomePage() {
                     />
                     <div className="product-actions-pro">
                       <button 
-                        className="product-action-btn-pro" 
-                        aria-label="Add to wishlist"
+                        className={`product-action-btn-pro ${isInWishlist(product.id) ? 'wishlist-active' : ''}`}
+                        aria-label={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Add wishlist functionality here if needed
+                          addToWishlist(product);
                         }}
                       >
-                        <Heart size={18} />
+                        <Heart 
+                          size={18} 
+                          fill={isInWishlist(product.id) ? "#ef4444" : "none"}
+                          color={isInWishlist(product.id) ? "#ef4444" : "currentColor"}
+                        />
                       </button>
                       <button 
                         className="product-action-btn-pro" 
@@ -905,37 +996,37 @@ export default function HomePage() {
               ))
             ) : (
               [1, 2, 3, 4].map((item, idx) => (
-                <div key={idx} className="product-card-pro" data-animate style={{ '--delay': `${idx * 0.1}s` }}>
-                  <div className="product-image-wrapper-pro">
-                    <div className="product-image-placeholder-pro">
-                      <Sparkles size={32} />
-                    </div>
-                    <div className="product-actions-pro">
-                      <button className="product-action-btn-pro" aria-label="Add to wishlist">
-                        <Heart size={18} />
-                      </button>
-                      <button className="product-action-btn-pro" aria-label="Quick view">
-                        <Search size={18} />
-                      </button>
-                    </div>
-                    <div className="product-badge-pro">
-                      <span>New</span>
-                    </div>
-                    <div className="product-hover-overlay"></div>
+              <div key={idx} className="product-card-pro" data-animate style={{ '--delay': `${idx * 0.1}s` }}>
+                <div className="product-image-wrapper-pro">
+                  <div className="product-image-placeholder-pro">
+                    <Sparkles size={32} />
                   </div>
-                  <div className="product-info-pro">
+                  <div className="product-actions-pro">
+                    <button className="product-action-btn-pro" aria-label="Add to wishlist">
+                      <Heart size={18} />
+                    </button>
+                    <button className="product-action-btn-pro" aria-label="Quick view">
+                      <Search size={18} />
+                    </button>
+                  </div>
+                  <div className="product-badge-pro">
+                    <span>New</span>
+                  </div>
+                  <div className="product-hover-overlay"></div>
+                </div>
+                <div className="product-info-pro">
                     <h3 className="product-name-pro">Loading...</h3>
-                    <div className="product-rating-pro">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={14} className="star-icon-pro" fill="#fbbf24" />
-                      ))}
-                      <span className="rating-text-pro">(4.8)</span>
-                    </div>
-                    <div className="product-price-pro">
+                  <div className="product-rating-pro">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={14} className="star-icon-pro" fill="#fbbf24" />
+                    ))}
+                    <span className="rating-text-pro">(4.8)</span>
+                  </div>
+                  <div className="product-price-pro">
                       <span className="price-current-pro">₹0</span>
-                    </div>
                   </div>
                 </div>
+              </div>
               ))
             )}
           </div>
@@ -1008,6 +1099,11 @@ export default function HomePage() {
         message={alertModal.message}
         type={alertModal.type}
         onClose={closeAlert}
+      />
+
+      <SearchModal 
+        show={showSearchModal} 
+        onClose={() => setShowSearchModal(false)} 
       />
     </div>
   );

@@ -122,14 +122,14 @@ export default function AddressBook() {
 
       <div className="address-page">
         <div className="shared-container">
-          <div className="address-header">
-            <button className="add-btn" onClick={openAddForm}>
-              <Plus size={18} /> Add New Address
-            </button>
-          </div>
+        <div className="address-header">
+          <button className="add-btn" onClick={openAddForm}>
+            <Plus size={18} /> Add New Address
+          </button>
+        </div>
 
-          {/* Address List */}
-          <div className="address-list">
+        {/* Address List */}
+        <div className="address-list">
           {addresses.length === 0 ? (
             <p>No address added yet.</p>
           ) : (
