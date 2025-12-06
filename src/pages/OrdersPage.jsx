@@ -64,7 +64,7 @@ export default function OrdersPage() {
         return <CheckCircle className="status-icon delivered" size={22} />;
       case "SHIPPED":
         return <Truck className="status-icon shipped" size={22} />;
-      case "PLACED":
+      case "CONFIRMED":
       case "PROCESSING":
         return <Clock className="status-icon placed" size={22} />;
       case "CANCELLED":
@@ -80,7 +80,7 @@ export default function OrdersPage() {
         return "#10b981";
       case "SHIPPED":
         return "#3b82f6";
-      case "PLACED":
+      case "CONFIRMED":
       case "PROCESSING":
         return "#f59e0b";
       case "CANCELLED":
@@ -110,7 +110,7 @@ export default function OrdersPage() {
   const getFilteredOrders = () => {
     if (activeTab === "all") return orders;
     return orders.filter(order => 
-      order.status?.toUpperCase() === activeTab.toUpperCase()
+      order.orderStatus?.toUpperCase() === activeTab.toUpperCase()
     );
   };
 
@@ -120,8 +120,9 @@ export default function OrdersPage() {
         return "Delivered";
       case "SHIPPED":
         return "Shipped";
-      case "PLACED":
+      case "CONFIRMED":
         return "Order Placed";
+        
       case "PROCESSING":
         return "Processing";
       case "CANCELLED":
@@ -182,7 +183,7 @@ export default function OrdersPage() {
               </div>
               <div className="stat-content">
                 <div className="stat-number">
-                  {orders.filter(o => o.status?.toUpperCase() === "DELIVERED").length}
+                  {orders.filter(o => o.orderStatus?.toUpperCase() === "DELIVERED").length}
                 </div>
                 <div className="stat-label">Delivered</div>
               </div>
@@ -194,7 +195,7 @@ export default function OrdersPage() {
               </div>
               <div className="stat-content">
                 <div className="stat-number">
-                  {orders.filter(o => o.status?.toUpperCase() === "SHIPPED").length}
+                  {orders.filter(o => o.orderStatus?.toUpperCase() === "SHIPPED").length}
                 </div>
                 <div className="stat-label">Shipped</div>
               </div>
@@ -207,7 +208,7 @@ export default function OrdersPage() {
               <div className="stat-content">
                 <div className="stat-number">
                   {orders.filter(o => 
-                    ["PLACED", "PROCESSING"].includes(o.status?.toUpperCase())
+                    ["PLACED", "PROCESSING"].includes(o.orderStatus?.toUpperCase())
                   ).length}
                 </div>
                 <div className="stat-label">Pending</div>
@@ -276,12 +277,12 @@ export default function OrdersPage() {
                   </div>
                   
                   <div className="order-status-badge" style={{ 
-                    backgroundColor: `${getStatusColor(order.status)}15`,
-                    color: getStatusColor(order.status),
-                    borderColor: getStatusColor(order.status)
+                    backgroundColor: `${getStatusColor(order.orderStatus)}15`,
+                    color: getStatusColor(order.orderStatus),
+                    borderColor: getStatusColor(order.orderStatus)
                   }}>
-                    {getStatusIcon(order.status)}
-                    <span>{getStatusText(order.status)}</span>
+                    {getStatusIcon(order.orderStatus)}
+                    <span>{getStatusText(order.orderStatus)}</span>
                   </div>
                 </div>
 
@@ -348,7 +349,7 @@ export default function OrdersPage() {
                     <div className="info-content">
                       <div className="info-label">Payment Method</div>
                       <div className="info-value">
-                        {order.itempaymentMethod || "Not specified"}
+                        {order.payment || "Not specified"}
                       </div>
                     </div>
                   </div>
