@@ -15,6 +15,13 @@ import NewArrivalsPage from "./pages/NewArrivalsPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import ContactPage from "./pages/ContactPage";
 import WishlistPage from "./pages/WishlistPage";
+import ShippingInfoPage from "./pages/ShippingInfoPage";
+import ReturnsPage from "./pages/ReturnsPage";
+import FAQPage from "./pages/FAQPage";
+import AboutPage from "./pages/AboutPage";
+import CareersPage from "./pages/CareersPage";
+import PressPage from "./pages/PressPage";
+import SustainabilityPage from "./pages/SustainabilityPage";
 
 
 function App() {
@@ -38,8 +45,13 @@ function App() {
         <Route path="/collections" element={<CollectionsPage/>}/>
         <Route path="/contact" element={<ContactPage/>}/>
         <Route path="/wishlist" element={<WishlistPage/>}/>
-
-
+        <Route path="/shipping" element={<ShippingInfoPage/>}/>
+        <Route path="/returns" element={<ReturnsPage/>}/>
+        <Route path="/faq" element={<FAQPage/>}/>
+        <Route path="/about" element={<AboutPage/>}/>
+        <Route path="/careers" element={<CareersPage/>}/>
+        <Route path="/press" element={<PressPage/>}/>
+        <Route path="/sustainability" element={<SustainabilityPage/>}/>
 
       </Routes>
     </BrowserRouter>

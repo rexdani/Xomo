@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Mail, Phone, MapPin, Clock, Send, Check, Loader } from "lucide-react";
 import Header from "../components/Header";
 import "../styles/contact.css";
-
+import axios from "axios";
+import { BASE_URL } from "../util/config.js";
 export default function ContactPage() {
   const [form, setForm] = useState({ 
     name: "", 
@@ -13,6 +14,10 @@ export default function ContactPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
+  const token = localStorage.getItem("token");
+  const authHeader = {
+    headers: { Authorization: token ? `Bearer ${token}` : "" },
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -39,26 +44,39 @@ export default function ContactPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+  
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-
+  
     setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Form submitted:", form);
-      setLoading(false);
+  
+    try {
+  
+      // SEND FORM DATA PROPERLY
+      const response = await axios.post(
+        `${BASE_URL}/contact`,
+        form,authHeader// <-- Body (correct)
+      );
+  
+      console.log("Backend Response:", response.data);
+  
+      // Show success message
       setSubmitted(true);
       setForm({ name: "", email: "", subject: "", message: "" });
-      
-      // Reset submitted state after 5 seconds
+  
+      // Auto-hide success message
       setTimeout(() => setSubmitted(false), 5000);
-    }, 1500);
+  
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   const contactInfo = [
     {
@@ -292,19 +310,19 @@ export default function ContactPage() {
           <div className="map-section">
             <div className="map-header">
               <h2 className="section-title">Find Our Store</h2>
-              <p className="section-subtitle">Visit our flagship store in Mumbai</p>
+              <p className="section-subtitle">Visit our location in Vaiyampatti, Tamil Nadu</p>
             </div>
             <div className="map-container">
-              <div className="map-placeholder">
-                <div className="map-overlay">
-                  <div className="map-info">
-                    <h3>XOMO Flagship Store</h3>
-                    <p>123 Fashion Street, Mumbai</p>
-                    <p>Open: Mon-Sat, 10am-8pm</p>
-                    <button className="map-btn">Get Directions</button>
-                  </div>
-                </div>
-              </div>
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7844.713273079413!2d78.2975219893639!3d10.551240005804052!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3baa72c57bd70875%3A0x2dca6b7dfc0882ab!2sVaiyampatti%2C%20Tamil%20Nadu%20621315!5e0!3m2!1sen!2sin!4v1765219376119!5m2!1sen!2sin" 
+                width="100%" 
+                height="450" 
+                style={{border:0}} 
+                allowFullScreen="" 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+                className="map-iframe"
+              ></iframe>
             </div>
           </div>
         </div>

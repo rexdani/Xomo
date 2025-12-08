@@ -69,11 +69,11 @@ export default function CheckoutPage() {
   const loadAddresses = async () => {
     try {
       const res = await axios.get(
-        `${BASE_URL}/user/profile`,
+        `${BASE_URL}/address`,
         authHeader()
       );
-      const user = res.data;
-      const userAddresses = user.address ? [user.address] : [];
+      ;
+      const userAddresses =  res.data || [];
       setAddresses(userAddresses);
       if (userAddresses.length > 0) {
         setSelectedAddress(userAddresses[0].id);
@@ -107,8 +107,8 @@ export default function CheckoutPage() {
 
   const subtotal = cart.reduce((sum, it) => sum + it.price * it.quantity, 0);
   const shipping = subtotal > 999 || subtotal === 0 ? 0 : 99;
-  const tax = subtotal * 0.18;
-  const total = subtotal + shipping + tax;
+  // const tax = subtotal * 0.18;
+  const total = subtotal + shipping ;
 
   // Format delivery date for display
   const formatDeliveryDate = () => {
@@ -334,20 +334,21 @@ const startPayment = async () => {
                   <div>
                     <h2 className="section-title-pro">Estimated Delivery</h2>
                     <p className="section-subtitle-pro">
-                      Your order will be delivered within 7 days
+                      Expected delivery date
                     </p>
                   </div>
                 </div>
 
-                <div className="delivery-dates-pro">
-                  <div className="delivery-option-pro selected">
-                    <div className="date-radio-pro">
-                      <div className="radio-dot-pro active"></div>
+                <div className="delivery-date-display-pro">
+                  <div className="delivery-date-content-pro">
+                    <Calendar className="delivery-calendar-icon-pro" size={20} />
+                    <div className="delivery-date-info-pro">
+                      <span className="delivery-date-label-pro">Expected Delivery</span>
+                      <span className="delivery-date-text-pro">{formatDeliveryDate()}</span>
                     </div>
-                    <div className="date-content-pro">
-                      <span className="date-label-pro">{formatDeliveryDate()}</span>
-                      <span className="express-badge-pro">Standard Delivery</span>
-                    </div>
+                  </div>
+                  <div className="delivery-type-wrapper-pro">
+                    <span className="delivery-type-badge-pro">Standard Delivery</span>
                   </div>
                 </div>
               </section>
@@ -474,10 +475,10 @@ const startPayment = async () => {
                     <span>Shipping</span>
                     <span>{shipping === 0 ? <span className="free-shipping-pro">FREE</span> : formatPrice(shipping)}</span>
                   </div>
-                  <div className="price-row-pro">
+                  {/* <div className="price-row-pro">
                     <span>Tax</span>
                     <span>{formatPrice(tax)}</span>
-                  </div>
+                  </div> */}
                   <div className="price-divider-pro"></div>
                   <div className="price-row-pro total-pro">
                     <span>Total Amount</span>

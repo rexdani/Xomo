@@ -1052,10 +1052,10 @@ export default function HomePage() {
               <div className="footer-pro-column">
                 <h4 className="footer-pro-heading">Shop</h4>
                 <ul className="footer-pro-list">
-                  <li><a href="/new-arrivals">New Arrivals</a></li>
-                  <li><a href="/best-sellers">Best Sellers</a></li>
-                  <li><a href="/sale">Sale</a></li>
-                  <li><a href="/collections">Collections</a></li>
+                  <li><a href="">New Arrivals</a></li>
+                  <li><a href="">Best Sellers</a></li>
+                  <li><a href="">Sale</a></li>
+                  <li><a href="">Collections</a></li>
                 </ul>
               </div>
 
