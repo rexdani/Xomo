@@ -129,6 +129,17 @@ export default function Header() {
         {/* Mobile Menu */}
         <div className={`mobile-drawer ${mobileMenu ? 'open' : ''}`}>
           <div className="mobile-nav">
+            <button 
+              className="mobile-nav-link mobile-search-btn" 
+              onClick={() => {
+                setShowSearchModal(true);
+                setMobileMenu(false);
+              }}
+            >
+              <Search size={18} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} />
+              Search Products
+            </button>
+            <div className="mobile-nav-divider"></div>
             <a href="/HomePage" className={`mobile-nav-link ${isActive('/HomePage') ? 'active' : ''}`} onClick={() => setMobileMenu(false)}>
               Home
             </a>

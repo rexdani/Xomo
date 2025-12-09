@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Mail, Lock, User, Phone, MapPin, ArrowRight, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff } from "lucide-react";
 import AlertModal from "../components/AlertModal";
 import "../styles/register.css";
 import "../styles/shared.css";
@@ -10,16 +10,10 @@ export default function RegisterPage() {
     fullName: "",
     email: "",
     password: "",
-    phone: "",
-    street: "",
-    city: "",
-    state: "",
-    country: "",
-    postalCode: ""
+    phone: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
   const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
 
   const showAlert = (message, type = "error") => {
@@ -43,18 +37,8 @@ export default function RegisterPage() {
         fullName: user.fullName,
         email: user.email,
         password: user.password,
-        phone: user.phone,
-        address: {
-          fullName: user.fullName,
-          phoneNumber: user.phone,
-          street: user.street,
-          city: user.city,
-          state: user.state,
-          country: user.country,
-          postalCode: user.postalCode
-        }
+        phone: user.phone
       };
-const host = window.location.hostname;
       const response = await axios.post(
         `${BASE_URL}/auth/register`,
         payload,
@@ -86,20 +70,9 @@ const host = window.location.hostname;
     return true;
   };
 
-  const nextStep = () => {
-    if (currentStep === 1 && user.fullName && user.email && user.password && user.phone) {
-      setCurrentStep(2);
-    }
-  };
-
-  const prevStep = () => {
-    setCurrentStep(1);
-  };
-
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      if (currentStep === 1) nextStep();
-      else registerUser();
+      registerUser();
     }
   };
 
@@ -119,188 +92,88 @@ const host = window.location.hostname;
           </div>
           <h1 className="auth-title-pro">Create Account</h1>
           <p className="auth-subtitle-pro">Join XOMO for exclusive benefits</p>
-          
-          <div className="step-indicator-pro">
-            <div className={`step-pro ${currentStep >= 1 ? 'active' : ''}`}>
-              <div className="step-number-pro">
-                <span>1</span>
-              </div>
-              <div className="step-label-pro">Personal</div>
-            </div>
-            <div className="step-line-pro"></div>
-            <div className={`step-pro ${currentStep >= 2 ? 'active' : ''}`}>
-              <div className="step-number-pro">
-                <span>2</span>
-              </div>
-              <div className="step-label-pro">Address</div>
-            </div>
-          </div>
         </div>
 
         <div className="auth-form-pro">
-          {currentStep === 1 && (
-            <>
-              <div className="input-group-pro">
-                <div className="input-wrapper-pro">
-                  <User className="input-icon-pro" size={20} />
-                  <input
-                    type="text"
-                    name="fullName"
-                    placeholder="Full Name"
-                    onChange={handleChange}
-                    onKeyPress={handleKeyPress}
-                    className="auth-input-pro"
-                  />
-                </div>
-              </div>
+          <div className="input-group-pro">
+            <div className="input-wrapper-pro">
+              <User className="input-icon-pro" size={20} />
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                onChange={handleChange}
+                onKeyPress={handleKeyPress}
+                className="auth-input-pro"
+              />
+            </div>
+          </div>
 
-              <div className="input-group-pro">
-                <div className="input-wrapper-pro">
-                  <Mail className="input-icon-pro" size={20} />
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email address"
-                    onChange={handleChange}
-                    onKeyPress={handleKeyPress}
-                    className="auth-input-pro"
-                  />
-                </div>
-              </div>
+          <div className="input-group-pro">
+            <div className="input-wrapper-pro">
+              <Mail className="input-icon-pro" size={20} />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email address"
+                onChange={handleChange}
+                onKeyPress={handleKeyPress}
+                className="auth-input-pro"
+              />
+            </div>
+          </div>
 
-              <div className="input-group-pro">
-                <div className="input-wrapper-pro">
-                  <Lock className="input-icon-pro" size={20} />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    placeholder="Password"
-                    onChange={handleChange}
-                    onKeyPress={handleKeyPress}
-                    className="auth-input-pro"
-                  />
-                  <button 
-                    type="button"
-                    className="password-toggle-pro"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label="Toggle password visibility"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-                <div className="input-hint-pro">Minimum 6 characters</div>
-              </div>
-
-              <div className="input-group-pro">
-                <div className="input-wrapper-pro">
-                  <Phone className="input-icon-pro" size={20} />
-                  <input
-                    type="text"
-                    name="phone"
-                    placeholder="Phone Number"
-                    onChange={handleChange}
-                    onKeyPress={handleKeyPress}
-                    className="auth-input-pro"
-                  />
-                </div>
-              </div>
-
-              <button className="auth-btn-pro primary-pro" onClick={nextStep}>
-                <span>Continue</span>
-                <ArrowRight size={18} />
+          <div className="input-group-pro">
+            <div className="input-wrapper-pro">
+              <Lock className="input-icon-pro" size={20} />
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                onChange={handleChange}
+                onKeyPress={handleKeyPress}
+                className="auth-input-pro"
+              />
+              <button 
+                type="button"
+                className="password-toggle-pro"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
-            </>
-          )}
+            </div>
+            <div className="input-hint-pro">Minimum 6 characters</div>
+          </div>
 
-          {currentStep === 2 && (
-            <>
-              <div className="address-section-pro">
-                <div className="section-header-pro">
-                  <div className="section-icon-wrapper-pro">
-                    <MapPin className="section-icon-pro" size={20} />
-                  </div>
-                  <h3 className="section-title-pro">Shipping Address</h3>
-                </div>
+          <div className="input-group-pro">
+            <div className="input-wrapper-pro">
+              <Phone className="input-icon-pro" size={20} />
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone Number"
+                onChange={handleChange}
+                onKeyPress={handleKeyPress}
+                className="auth-input-pro"
+              />
+            </div>
+          </div>
 
-                <div className="input-group-pro">
-                  <input
-                    type="text"
-                    name="street"
-                    placeholder="Street Address"
-                    onChange={handleChange}
-                    onKeyPress={handleKeyPress}
-                    className="auth-input-pro"
-                  />
-                </div>
-
-                <div className="form-row-pro">
-                  <div className="input-group-pro">
-                    <input
-                      type="text"
-                      name="city"
-                      placeholder="City"
-                      onChange={handleChange}
-                      onKeyPress={handleKeyPress}
-                      className="auth-input-pro"
-                    />
-                  </div>
-                  <div className="input-group-pro">
-                    <input
-                      type="text"
-                      name="state"
-                      placeholder="State"
-                      onChange={handleChange}
-                      onKeyPress={handleKeyPress}
-                      className="auth-input-pro"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row-pro">
-                  <div className="input-group-pro">
-                    <input
-                      type="text"
-                      name="country"
-                      placeholder="Country"
-                      onChange={handleChange}
-                      onKeyPress={handleKeyPress}
-                      className="auth-input-pro"
-                    />
-                  </div>
-                  <div className="input-group-pro">
-                    <input
-                      type="text"
-                      name="postalCode"
-                      placeholder="Postal Code"
-                      onChange={handleChange}
-                      onKeyPress={handleKeyPress}
-                      className="auth-input-pro"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-actions-pro">
-                <button className="auth-btn-pro secondary-pro" onClick={prevStep}>
-                  Back
-                </button>
-                <button 
-                  className={`auth-btn-pro primary-pro ${isLoading ? 'loading' : ''}`}
-                  onClick={registerUser}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <div className="shared-spinner shared-spinner-small"></div>
-                  ) : (
-                    <>
-                      <span>Create Account</span>
-                      <ArrowRight size={18} />
-                    </>
-                  )}
-                </button>
-              </div>
-            </>
-          )}
+          <button 
+            className={`auth-btn-pro primary-pro ${isLoading ? 'loading' : ''}`}
+            onClick={registerUser}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="shared-spinner shared-spinner-small"></div>
+            ) : (
+              <>
+                <span>Create Account</span>
+                <ArrowRight size={18} />
+              </>
+            )}
+          </button>
         </div>
 
         <div className="auth-footer-pro">
