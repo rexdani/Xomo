@@ -9,6 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import CheckoutPage  from "./pages/CheckoutPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import OrdersPage from "./pages/OrdersPage";
+import OrderDetailsPage from "./pages/OrderDetailsPage";
 import AddressBook from "./pages/addressbook";
 import CategoriesPage from "./pages/CategoriesPage";
 import NewArrivalsPage from "./pages/NewArrivalsPage";
@@ -39,6 +40,7 @@ function App() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/order-success" element={<OrderSuccessPage />} />
         <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/:id" element={<OrderDetailsPage />} />
         <Route path="/address" element={<AddressBook/>}/>
         <Route path="/categories" element={<CategoriesPage/>}/>
         <Route path="/new-arrivals" element={<NewArrivalsPage/>}/>

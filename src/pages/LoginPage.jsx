@@ -29,6 +29,61 @@ export default function LoginPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Helper function to create address from user profile
+  const createAddressFromProfile = async (token) => {
+    try {
+      // Check if user already has addresses
+      const addressRes = await axios.get(
+        `${BASE_URL}/address`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // If addresses exist, skip
+      if (addressRes.data && addressRes.data.length > 0) {
+        return;
+      }
+
+      // Fetch user profile
+      const profileRes = await axios.get(
+        `${BASE_URL}/user/profile`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const user = profileRes.data;
+
+      // Check if user has address data in profile
+      if (user.address && (
+        user.address.street || 
+        user.address.city || 
+        user.address.state || 
+        user.address.country || 
+        user.address.postalCode
+      )) {
+        // Create address from profile data
+        const addressData = {
+          fullName: user.name || "User",
+          phoneNumber: user.phone || "",
+          street: user.address.street || "",
+          city: user.address.city || "",
+          state: user.address.state || "",
+          country: user.address.country || "",
+          postalCode: user.address.postalCode || ""
+        };
+
+        // Only create if we have meaningful address data
+        if (addressData.street || addressData.city || addressData.state) {
+          await axios.post(
+            `${BASE_URL}/address`,
+            addressData,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        }
+      }
+    } catch (err) {
+      // Silently fail - user can add address manually
+      console.log("Could not auto-create address from profile");
+    }
+  };
+
   const loginUser = async () => {
     if (!form.email || !form.password) {
       showAlert("Please fill in all fields");
@@ -44,8 +99,12 @@ export default function LoginPage() {
       );
 
       // Save JWT
-      localStorage.setItem("token", response.data.token);
+      const token = response.data.token;
+      localStorage.setItem("token", token);
       localStorage.setItem("userId", response.data.userId);
+
+      // Create address from profile if needed (non-blocking)
+      createAddressFromProfile(token).catch(() => {});
 
       navigate("/HomePage", { replace: true });
 
@@ -70,8 +129,12 @@ export default function LoginPage() {
   // Send Google ID Token → Spring Boot
   axios.post(`${BASE_URL}/auth/google`, { idToken })
     .then((res) => {
-      localStorage.setItem("token", res.data.token);
+      const token = res.data.token;
+      localStorage.setItem("token", token);
       localStorage.setItem("userId", res.data.userId);
+
+      // Create address from profile if needed (non-blocking)
+      createAddressFromProfile(token).catch(() => {});
 
       navigate("/HomePage", { replace: true });
     })

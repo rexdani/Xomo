@@ -129,19 +129,19 @@ export default function ContactPage() {
       <Header />
       <div className="contact-page">
         {/* Hero Section */}
-      <section className="contact-hero">
-        <div className="container">
-          <div className="hero-content">
-            <h1 className="hero-title">Get in Touch</h1>
-            <p className="hero-subtitle">
-              We're here to help! Reach out with any questions, feedback, or partnership inquiries.
-            </p>
+        <section className="contact-hero">
+          <div className="container">
+            <div className="hero-content">
+              <h1 className="hero-title">Get in Touch</h1>
+              <p className="hero-subtitle">
+                We're here to help! Reach out with any questions, feedback, or partnership inquiries.
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Main Content */}
-      <div className="contact-container">
+        {/* Main Content */}
+        <div className="contact-container">
         <div className="container">
           <div className="contact-content">
             {/* Contact Info Sidebar */}
@@ -326,7 +326,7 @@ export default function ContactPage() {
             </div>
           </div>
         </div>
-      </div>
+        </div>
       </div>
     </>
   );

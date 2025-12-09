@@ -72,14 +72,70 @@ export default function CheckoutPage() {
         `${BASE_URL}/address`,
         authHeader()
       );
-      ;
-      const userAddresses =  res.data || [];
-      setAddresses(userAddresses);
-      if (userAddresses.length > 0) {
+      const userAddresses = res.data || [];
+      
+      // If no addresses exist, try to create one from user profile
+      if (userAddresses.length === 0) {
+        await createAddressFromProfile();
+        // Reload addresses after creating
+        const resAfter = await axios.get(
+          `${BASE_URL}/address`,
+          authHeader()
+        );
+        const newAddresses = resAfter.data || [];
+        setAddresses(newAddresses);
+        if (newAddresses.length > 0) {
+          setSelectedAddress(newAddresses[0].id);
+        }
+      } else {
+        setAddresses(userAddresses);
         setSelectedAddress(userAddresses[0].id);
       }
     } catch (err) {
       console.error("Address load failed", err);
+    }
+  };
+
+  const createAddressFromProfile = async () => {
+    try {
+      // Fetch user profile
+      const profileRes = await axios.get(
+        `${BASE_URL}/user/profile`,
+        authHeader()
+      );
+      const user = profileRes.data;
+
+      // Check if user has address data in profile
+      if (user.address && (
+        user.address.street || 
+        user.address.city || 
+        user.address.state || 
+        user.address.country || 
+        user.address.postalCode
+      )) {
+        // Create address from profile data
+        const addressData = {
+          fullName: user.name || "User",
+          phoneNumber: user.phone || "",
+          street: user.address.street || "",
+          city: user.address.city || "",
+          state: user.address.state || "",
+          country: user.address.country || "",
+          postalCode: user.address.postalCode || ""
+        };
+
+        // Only create if we have meaningful address data
+        if (addressData.street || addressData.city || addressData.state) {
+          await axios.post(
+            `${BASE_URL}/address`,
+            addressData,
+            authHeader()
+          );
+        }
+      }
+    } catch (err) {
+      console.error("Failed to create address from profile", err);
+      // Silently fail - user can add address manually
     }
   };
 
