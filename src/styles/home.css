@@ -2369,19 +2369,39 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.product-action-btn-pro svg {
+  stroke: currentColor;
+  width: 18px;
+  height: 18px;
+}
+
 .product-action-btn-pro:hover {
   background: var(--primary-color);
   color: white;
   transform: scale(1.1);
 }
 
+.product-action-btn-pro:hover svg {
+  stroke: currentColor;
+}
+
 .product-action-btn-pro.wishlist-active {
   color: #ef4444;
+}
+
+.product-action-btn-pro.wishlist-active svg {
+  stroke: currentColor;
+  fill: currentColor;
 }
 
 .product-action-btn-pro.wishlist-active:hover {
   background: rgba(239, 68, 68, 0.1);
   color: #dc2626;
+}
+
+.product-action-btn-pro.wishlist-active:hover svg {
+  stroke: currentColor;
+  fill: currentColor;
 }
 
 .product-badge-pro {
@@ -2431,6 +2451,13 @@
   color: #fbbf24;
 }
 
+.star-icon-pro svg {
+  stroke: currentColor;
+  fill: currentColor;
+  width: 14px;
+  height: 14px;
+}
+
 .rating-text-pro {
   font-size: 0.875rem;
   color: var(--text-secondary);
@@ -2474,6 +2501,13 @@
   gap: 0.5rem;
   transition: all var(--transition-base);
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.add-to-cart-btn-pro svg {
+  stroke: currentColor;
+  fill: none;
+  width: 16px;
+  height: 16px;
 }
 
 .add-to-cart-btn-pro:hover:not(:disabled) {
@@ -3107,6 +3141,13 @@
 .star-icon {
   color: #fbbf24;
   fill: #fbbf24;
+}
+
+.star-icon svg {
+  stroke: currentColor;
+  fill: currentColor;
+  width: 14px;
+  height: 14px;
 }
 
 .rating-text {

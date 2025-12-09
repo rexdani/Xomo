@@ -248,6 +248,13 @@
   padding: 0;
 }
 
+.action-btn svg {
+  stroke: currentColor;
+  fill: none;
+  width: 28px;
+  height: 28px;
+}
+
 .action-btn:hover {
   transform: scale(1.15);
 }
@@ -256,16 +263,34 @@
   color: #6b7280;
 }
 
+.action-btn.wishlist svg {
+  stroke: currentColor;
+}
+
 .action-btn.wishlist:hover {
   color: #ef4444;
+}
+
+.action-btn.wishlist:hover svg {
+  stroke: currentColor;
 }
 
 .action-btn.wishlist.active {
   color: #ef4444;
 }
 
+.action-btn.wishlist.active svg {
+  stroke: currentColor;
+  fill: currentColor;
+}
+
 .action-btn.wishlist.active:hover {
   color: #dc2626;
+}
+
+.action-btn.wishlist.active:hover svg {
+  stroke: currentColor;
+  fill: currentColor;
 }
 
 /* Badges */

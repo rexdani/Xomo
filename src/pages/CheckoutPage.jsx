@@ -88,7 +88,7 @@ export default function CheckoutPage() {
           setSelectedAddress(newAddresses[0].id);
         }
       } else {
-        setAddresses(userAddresses);
+      setAddresses(userAddresses);
         setSelectedAddress(userAddresses[0].id);
       }
     } catch (err) {
