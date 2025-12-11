@@ -337,48 +337,60 @@ const startPayment = async () => {
               
               {/* Delivery Address */}
               <section className="checkout-section-pro">
-                <div className="section-header-pro">
-                  <div className="section-icon-wrapper-pro">
-                    <MapPin className="section-icon-pro" size={24} />
-                  </div>
-                  <div>
-                    <h2 className="section-title-pro">Delivery Address</h2>
-                    <p className="section-subtitle-pro">
-                      Where should we deliver your order?
-                    </p>
-                  </div>
-                </div>
+  <div className="section-header-pro">
+    <div className="section-icon-wrapper-pro">
+      <MapPin className="section-icon-pro" size={24} />
+    </div>
+    <div>
+      <h2 className="section-title-pro">Delivery Address</h2>
+      <p className="section-subtitle-pro">
+        Where should we deliver your order?
+      </p>
+    </div>
+  </div>
 
-                <div className="addresses-grid-pro">
-                  {addresses.map((addr, index) => (
-                    <div
-                      key={addr.id}
-                      className={`address-card-pro ${
-                        selectedAddress === addr.id ? "selected" : ""
-                      }`}
-                      onClick={() => setSelectedAddress(addr.id)}
-                      style={{ '--delay': `${index * 0.1}s` }}
-                    >
-                      <div className="address-radio-pro">
-                        <div
-                          className={`radio-dot-pro ${
-                            selectedAddress === addr.id ? "active" : ""
-                          }`}
-                        ></div>
-                      </div>
-                      <div className="address-content-pro">
-                        <h3 className="address-name-pro">{addr.fullName}</h3>
-                        <p className="address-line-pro">{addr.street}</p>
-                        <p className="address-line-pro">
-                          {addr.city}, {addr.state} - {addr.postalCode}
-                        </p>
-                        <p className="address-line-pro">{addr.country}</p>
-                        <p className="address-phone-pro">📱 {addr.phoneNumber}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+  {/* ➕ Add Address Button */}
+  <div className="address-actions-pro">
+    <button 
+      className="add-address-btn-pro"
+      onClick={() => navigate("/address")}
+    >
+      + Add New Address
+    </button>
+  </div>
+
+  <div className="addresses-grid-pro">
+    {addresses.map((addr, index) => (
+      <div
+        key={addr.id}
+        className={`address-card-pro ${
+          selectedAddress === addr.id ? "selected" : ""
+        }`}
+        onClick={() => setSelectedAddress(addr.id)}
+        style={{ "--delay": `${index * 0.1}s` }}
+      >
+        <div className="address-radio-pro">
+          <div
+            className={`radio-dot-pro ${
+              selectedAddress === addr.id ? "active" : ""
+            }`}
+          ></div>
+        </div>
+
+        <div className="address-content-pro">
+          <h3 className="address-name-pro">{addr.fullName}</h3>
+          <p className="address-line-pro">{addr.street}</p>
+          <p className="address-line-pro">
+            {addr.city}, {addr.state} - {addr.postalCode}
+          </p>
+          <p className="address-line-pro">{addr.country}</p>
+          <p className="address-phone-pro">📱 {addr.phoneNumber}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
 
 
               {/* Delivery Date */}

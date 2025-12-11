@@ -146,17 +146,23 @@ export default function LoginPage() {
     });
 };
 useEffect(() => {
-  if (window.google) {
-    google.accounts.id.initialize({
-      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-      callback: handleGoogleLogin,
-    });
+  const checkGoogle = setInterval(() => {
+    if (window.google) {
+      google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleGoogleLogin,
+      });
 
-    google.accounts.id.renderButton(
-      document.getElementById("googleLoginBtn"),
-      { theme: "outline", size: "large", width: 340 }
-    );
-  }
+      google.accounts.id.renderButton(
+        document.getElementById("googleLoginBtn"),
+        { theme: "outline", size: "large", width: 340 }
+      );
+
+      clearInterval(checkGoogle);
+    }
+  }, 300);
+
+  return () => clearInterval(checkGoogle);
 }, []);
 
   return (
