@@ -180,7 +180,7 @@ useEffect(() => {
         <div className="auth-form-pro">
           <div className="input-group-pro">
             <div className="input-wrapper-pro">
-              <Mail className="input-icon-pro" size={20} />
+              <Mail className="input-icon-pro" size={20} strokeWidth={2} />
               <input
                 type="email"
                 name="email"
@@ -188,13 +188,14 @@ useEffect(() => {
                 onChange={handleChange}
                 onKeyPress={handleKeyPress}
                 className="auth-input-pro"
+                autoComplete="email"
               />
             </div>
           </div>
 
           <div className="input-group-pro">
             <div className="input-wrapper-pro">
-              <Lock className="input-icon-pro" size={20} />
+              <Lock className="input-icon-pro" size={20} strokeWidth={2} />
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
@@ -202,6 +203,7 @@ useEffect(() => {
                 onChange={handleChange}
                 onKeyPress={handleKeyPress}
                 className="auth-input-pro"
+                autoComplete="current-password"
               />
               <button 
                 type="button"
@@ -209,7 +211,7 @@ useEffect(() => {
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label="Toggle password visibility"
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                {showPassword ? <EyeOff size={20} strokeWidth={2} /> : <Eye size={20} strokeWidth={2} />}
               </button>
             </div>
           </div>

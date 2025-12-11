@@ -317,6 +317,20 @@
   box-shadow: var(--shadow-md);
 }
 
+/* Mobile overrides - ensure simple design on mobile */
+@media (max-width: 768px) {
+  .action-btn {
+    background: #f8fafc !important;
+    border: 1px solid #e5e7eb !important;
+  }
+  
+  .action-btn:hover {
+    background: #f1f5f9 !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
 .cart-badge {
   position: absolute;
   top: -4px;
@@ -354,6 +368,15 @@
   height: 44px;
   justify-content: center;
   align-items: center;
+}
+
+/* Mobile overrides - ensure simple design on mobile */
+@media (max-width: 768px) {
+  .hamburger {
+    background: #f8fafc !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+  }
 }
 
 .hamburger-line {
@@ -3692,11 +3715,77 @@ html {
 
   .hamburger {
     display: flex;
+    background: #f8fafc !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
   }
 
   .header-inner {
-    padding: 1rem 1.5rem;
-    height: 70px;
+    padding: 0.75rem 1rem;
+    height: 60px;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .brand {
+    flex-shrink: 0 !important;
+    margin-right: auto !important;
+  }
+
+  .header-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    justify-content: flex-end !important;
+  }
+
+  .action-btn {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    background: transparent !important;
+    border: 1px solid #d0d5dd !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .action-btn:hover {
+    background: #f2f4f7 !important;
+    transform: none !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: none !important;
+  }
+
+  .action-btn.active {
+    background: #111827 !important;
+    border-color: #111827 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .action-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+    stroke-width: 2 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .action-btn:hover svg {
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .action-btn.active svg {
+    color: white !important;
+    transform: none !important;
+    filter: none !important;
+  }
   }
 
   .hero-section-new {
@@ -3982,6 +4071,57 @@ html {
 }
 
 @media (max-width: 480px) {
+  .header-inner {
+    padding: 0.75rem 0.75rem !important;
+    height: 56px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+  }
+
+  .brand {
+    flex-shrink: 0 !important;
+    margin-right: auto !important;
+  }
+
+  .header-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    justify-content: flex-end !important;
+  }
+
+  .action-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 9px !important;
+    background: transparent !important;
+    border: 1px solid #d0d5dd !important;
+  }
+
+  .action-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    stroke-width: 2 !important;
+  }
+
+  .hamburger {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 9px !important;
+    background: transparent !important;
+    border: 1px solid #d0d5dd !important;
+  }
+
+  .hamburger-line {
+    width: 18px !important;
+    height: 2.5px !important;
+  }
+
   .hero-title {
     font-size: 2rem;
   }

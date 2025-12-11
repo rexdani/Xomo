@@ -99,16 +99,16 @@ export default function Header() {
               aria-label="Search"
               onClick={() => setShowSearchModal(true)}
             >
-              <Search size={20} />
+              <Search size={22} strokeWidth={2.5} />
             </button>
             <a href="/wishlist" className={`action-btn wishlist-btn ${isActive('/wishlist') ? 'active' : ''}`} aria-label="Wishlist">
-              <Heart size={20} />
+              <Heart size={22} strokeWidth={2.5} />
             </a>
             <a href="/profile" className={`action-btn user-btn ${isActive('/profile') ? 'active' : ''}`} aria-label="Profile">
-              <User size={20} />
+              <User size={22} strokeWidth={2.5} />
             </a>
             <a href="/cart" className={`action-btn cart-btn ${isActive('/cart') ? 'active' : ''}`} aria-label="Cart">
-              <ShoppingCart size={20} />
+              <ShoppingCart size={22} strokeWidth={2.5} />
               {cartCount > 0 && (
                 <span className="cart-badge">{cartCount > 99 ? '99+' : cartCount}</span>
               )}
@@ -136,8 +136,8 @@ export default function Header() {
                 setMobileMenu(false);
               }}
             >
-              <Search size={18} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} />
-              Search Products
+              <Search size={20} strokeWidth={2.5} />
+              <span>Search Products</span>
             </button>
             <div className="mobile-nav-divider"></div>
             <a href="/HomePage" className={`mobile-nav-link ${isActive('/HomePage') ? 'active' : ''}`} onClick={() => setMobileMenu(false)}>
