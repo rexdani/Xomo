@@ -884,3 +884,25 @@
     padding: 1rem;
   }
 }
+.add-address-btn-pro {
+  background: var(--primary-color);
+  color: #fff;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: 0.3s ease;
+}
+
+.add-address-btn-pro:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+.add-address-btn-pro:active {
+  transform: scale(0.97);
+}
+

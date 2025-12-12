@@ -164,6 +164,16 @@ useEffect(() => {
 
   return () => clearInterval(checkGoogle);
 }, []);
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    navigate("/HomePage", { replace: true });
+  }
+  else{
+    navigate("/", { replace: true });
+  }
+}, []);
+
 
   return (
     <div className="auth-page-pro">
