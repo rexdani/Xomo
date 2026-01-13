@@ -164,8 +164,6 @@ useEffect(() => {
 
   return () => clearInterval(checkGoogle);
 }, []);
-
-
   return (
     <div className="auth-page-pro">
       <div className="auth-background-pro">

@@ -299,7 +299,7 @@ const formatted = items.map((it) => {
                         <div className="item-controls-pro">
                           <div className="quantity-selector-pro">
                             <button 
-                              className="qty-btn"
+                              className=""
                               onClick={() => changeQty(item.id, item.qty - 1)}
                               disabled={item.qty <= 1}
                               aria-label="Decrease quantity"
@@ -308,7 +308,7 @@ const formatted = items.map((it) => {
                             </button>
                             <span className="quantity-pro">{item.qty}</span>
                             <button 
-                              className="qty-btn"
+                              className=""
                               onClick={() => changeQty(item.id, item.qty + 1)}
                               aria-label="Increase quantity"
                             >
