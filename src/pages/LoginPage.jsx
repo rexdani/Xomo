@@ -17,6 +17,13 @@ export default function LoginPage() {
   const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/HomePage", { replace: true });
+    }
+  }, [navigate]);
+
   const showAlert = (message, type = "error") => {
     setAlertModal({ show: true, message, type });
   };

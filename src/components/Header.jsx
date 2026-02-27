@@ -15,7 +15,7 @@ export default function Header() {
 
   // Scroll detection for header
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = () => {    
       setIsScrolled(window.scrollY > 50);
     };
     

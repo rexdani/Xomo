@@ -41,6 +41,11 @@ export default function AddressBook() {
 
   // Load addresses
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+      return;
+    }
     loadAddresses();
   }, []);
 
@@ -120,111 +125,111 @@ export default function AddressBook() {
           </div>
         </div>
 
-      <div className="address-page">
-        <div className="shared-container">
-        <div className="address-header">
-          <button className="add-btn" onClick={openAddForm}>
-            <Plus size={18} /> Add New Address
-          </button>
-        </div>
+        <div className="address-page">
+          <div className="shared-container">
+            <div className="address-header">
+              <button className="add-btn" onClick={openAddForm}>
+                <Plus size={18} /> Add New Address
+              </button>
+            </div>
 
-        {/* Address List */}
-        <div className="address-list">
-          {addresses.length === 0 ? (
-            <p>No address added yet.</p>
-          ) : (
-            addresses.map((addr) => (
-              <div className="address-card" key={addr.id}>
-                <div className="address-info">
-                  <MapPin size={22} className="address-icon" />
-                  <div>
-                    <h3>{addr.fullName}</h3>
-                    <p>{addr.street}</p>
-                    <p>
-                      {addr.city}, {addr.state} - {addr.postalCode}
-                    </p>
-                    <p>{addr.country}</p>
-                    <p>📞 {addr.phoneNumber}</p>
+            {/* Address List */}
+            <div className="address-list">
+              {addresses.length === 0 ? (
+                <p>No address added yet.</p>
+              ) : (
+                addresses.map((addr) => (
+                  <div className="address-card" key={addr.id}>
+                    <div className="address-info">
+                      <MapPin size={22} className="address-icon" />
+                      <div>
+                        <h3>{addr.fullName}</h3>
+                        <p>{addr.street}</p>
+                        <p>
+                          {addr.city}, {addr.state} - {addr.postalCode}
+                        </p>
+                        <p>{addr.country}</p>
+                        <p>📞 {addr.phoneNumber}</p>
+                      </div>
+                    </div>
+
+                    <div className="address-actions">
+                      <button className="edit-btn" onClick={() => openEditForm(addr)}>
+                        <Edit size={18} />
+                      </button>
+                      <button className="delete-btn" onClick={() => deleteAddress(addr.id)}>
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-
-                <div className="address-actions">
-                  <button className="edit-btn" onClick={() => openEditForm(addr)}>
-                    <Edit size={18} />
-                  </button>
-                  <button className="delete-btn" onClick={() => deleteAddress(addr.id)}>
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-          </div>
-        </div>
-
-        {/* Modal Form */}
-        {showForm && (
-          <div className="address-modal">
-            <div className="modal-content">
-              <h3>{editMode ? "Edit Address" : "Add New Address"}</h3>
-
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={form.fullName}
-                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              />
-
-              <input
-                type="text"
-                placeholder="Phone Number"
-                value={form.phoneNumber}
-                onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
-              />
-
-              <input
-                type="text"
-                placeholder="Street Address"
-                value={form.street}
-                onChange={(e) => setForm({ ...form, street: e.target.value })}
-              />
-
-              <input
-                type="text"
-                placeholder="City"
-                value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
-              />
-
-              <input
-                type="text"
-                placeholder="State"
-                value={form.state}
-                onChange={(e) => setForm({ ...form, state: e.target.value })}
-              />
-
-              <input
-                type="text"
-                placeholder="Country"
-                value={form.country}
-                onChange={(e) => setForm({ ...form, country: e.target.value })}
-              />
-
-              <input
-                type="text"
-                placeholder="Postal Code"
-                value={form.postalCode}
-                onChange={(e) => setForm({ ...form, postalCode: e.target.value })}
-              />
-
-              <div className="modal-actions">
-                <button className="save-btn" onClick={saveAddress}>Save</button>
-                <button className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
-              </div>
+                ))
+              )}
             </div>
           </div>
-        )}
-      </div>
+
+          {/* Modal Form */}
+          {showForm && (
+            <div className="address-modal">
+              <div className="modal-content">
+                <h3>{editMode ? "Edit Address" : "Add New Address"}</h3>
+
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={form.fullName}
+                  onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                />
+
+                <input
+                  type="text"
+                  placeholder="Phone Number"
+                  value={form.phoneNumber}
+                  onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+                />
+
+                <input
+                  type="text"
+                  placeholder="Street Address"
+                  value={form.street}
+                  onChange={(e) => setForm({ ...form, street: e.target.value })}
+                />
+
+                <input
+                  type="text"
+                  placeholder="City"
+                  value={form.city}
+                  onChange={(e) => setForm({ ...form, city: e.target.value })}
+                />
+
+                <input
+                  type="text"
+                  placeholder="State"
+                  value={form.state}
+                  onChange={(e) => setForm({ ...form, state: e.target.value })}
+                />
+
+                <input
+                  type="text"
+                  placeholder="Country"
+                  value={form.country}
+                  onChange={(e) => setForm({ ...form, country: e.target.value })}
+                />
+
+                <input
+                  type="text"
+                  placeholder="Postal Code"
+                  value={form.postalCode}
+                  onChange={(e) => setForm({ ...form, postalCode: e.target.value })}
+                />
+
+                <div className="modal-actions">
+                  <button className="save-btn" onClick={saveAddress}>Save</button>
+                  <button className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <AlertModal

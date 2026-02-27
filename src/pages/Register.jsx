@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff } from "lucide-react";
 import AlertModal from "../components/AlertModal";
@@ -15,6 +16,14 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [alertModal, setAlertModal] = useState({ show: false, message: "", type: "error" });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/HomePage", { replace: true });
+    }
+  }, [navigate]);
 
   const showAlert = (message, type = "error") => {
     setAlertModal({ show: true, message, type });
@@ -83,7 +92,7 @@ export default function RegisterPage() {
         <div className="bg-blob-pro blob-2"></div>
         <div className="bg-blob-pro blob-3"></div>
       </div>
-      
+
       <div className="auth-card-pro">
         <div className="auth-header-pro">
           <div className="brand-logo-pro">
@@ -95,89 +104,89 @@ export default function RegisterPage() {
         </div>
 
         <div className="auth-form-pro">
-              <div className="input-group-pro">
-                <div className="input-wrapper-pro">
+          <div className="input-group-pro">
+            <div className="input-wrapper-pro">
               <User className="input-icon-pro" size={20} strokeWidth={2} />
-                  <input
-                    type="text"
-                    name="fullName"
-                    placeholder="Full Name"
-                    onChange={handleChange}
-                    onKeyPress={handleKeyPress}
-                    className="auth-input-pro"
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                onChange={handleChange}
+                onKeyPress={handleKeyPress}
+                className="auth-input-pro"
                 autoComplete="name"
-                  />
-                </div>
-              </div>
+              />
+            </div>
+          </div>
 
-              <div className="input-group-pro">
-                <div className="input-wrapper-pro">
+          <div className="input-group-pro">
+            <div className="input-wrapper-pro">
               <Mail className="input-icon-pro" size={20} strokeWidth={2} />
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email address"
-                    onChange={handleChange}
-                    onKeyPress={handleKeyPress}
-                    className="auth-input-pro"
+              <input
+                type="email"
+                name="email"
+                placeholder="Email address"
+                onChange={handleChange}
+                onKeyPress={handleKeyPress}
+                className="auth-input-pro"
                 autoComplete="email"
-                  />
-                </div>
-              </div>
+              />
+            </div>
+          </div>
 
-              <div className="input-group-pro">
-                <div className="input-wrapper-pro">
+          <div className="input-group-pro">
+            <div className="input-wrapper-pro">
               <Lock className="input-icon-pro" size={20} strokeWidth={2} />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    placeholder="Password"
-                    onChange={handleChange}
-                    onKeyPress={handleKeyPress}
-                    className="auth-input-pro"
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                onChange={handleChange}
+                onKeyPress={handleKeyPress}
+                className="auth-input-pro"
                 autoComplete="new-password"
-                  />
-                  <button 
-                    type="button"
-                    className="password-toggle-pro"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label="Toggle password visibility"
-                  >
+              />
+              <button
+                type="button"
+                className="password-toggle-pro"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label="Toggle password visibility"
+              >
                 {showPassword ? <EyeOff size={20} strokeWidth={2} /> : <Eye size={20} strokeWidth={2} />}
-                  </button>
-                </div>
-                <div className="input-hint-pro">Minimum 6 characters</div>
-              </div>
+              </button>
+            </div>
+            <div className="input-hint-pro">Minimum 6 characters</div>
+          </div>
 
-              <div className="input-group-pro">
-                <div className="input-wrapper-pro">
+          <div className="input-group-pro">
+            <div className="input-wrapper-pro">
               <Phone className="input-icon-pro" size={20} strokeWidth={2} />
-                  <input
+              <input
                 type="tel"
-                    name="phone"
-                    placeholder="Phone Number"
-                    onChange={handleChange}
-                    onKeyPress={handleKeyPress}
-                    className="auth-input-pro"
+                name="phone"
+                placeholder="Phone Number"
+                onChange={handleChange}
+                onKeyPress={handleKeyPress}
+                className="auth-input-pro"
                 autoComplete="tel"
-                    />
-                  </div>
-                </div>
+              />
+            </div>
+          </div>
 
-                <button 
-                  className={`auth-btn-pro primary-pro ${isLoading ? 'loading' : ''}`}
-                  onClick={registerUser}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <div className="shared-spinner shared-spinner-small"></div>
-                  ) : (
-                    <>
-                      <span>Create Account</span>
-                      <ArrowRight size={18} />
-                    </>
-                  )}
-                </button>
+          <button
+            className={`auth-btn-pro primary-pro ${isLoading ? 'loading' : ''}`}
+            onClick={registerUser}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="shared-spinner shared-spinner-small"></div>
+            ) : (
+              <>
+                <span>Create Account</span>
+                <ArrowRight size={18} />
+              </>
+            )}
+          </button>
         </div>
 
         <div className="auth-footer-pro">

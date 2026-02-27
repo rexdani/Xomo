@@ -39,9 +39,13 @@ export default function CartPage() {
 
   useEffect(() => {
     const uid = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+    if (!token || !uid) {
+      navigate("/");
+      return;
+    }
     setUserId(uid);
-    if (uid) loadCart(uid);
-    else setIsLoading(false);
+    loadCart(uid);
   }, []);
 
   const authHeader = () => {
@@ -59,7 +63,7 @@ export default function CartPage() {
           responseType: "arraybuffer"
         }
       );
-      
+
       // Convert arraybuffer to base64
       const base64 = btoa(
         new Uint8Array(response.data).reduce(
@@ -67,7 +71,7 @@ export default function CartPage() {
           ''
         )
       );
-      
+
       return `data:image/jpeg;base64,${base64}`;
     } catch (error) {
       console.error("Error loading product image:", error);
@@ -85,28 +89,28 @@ export default function CartPage() {
 
       // Fetch images for all cart items
       // Fetch images & product details for all cart items
-const formatted = items.map((it) => {
-  if (!it.product) {
-    console.error("Missing product in cart item:", it);
-    return null;
-  }
+      const formatted = items.map((it) => {
+        if (!it.product) {
+          console.error("Missing product in cart item:", it);
+          return null;
+        }
 
-  const product = it.product;
+        const product = it.product;
 
-  return {
-    ...it,
-    productId: product.id,
-    name: product.name,
-    price: product.price,
-    qty: it.quantity || 1,
-    totalPrice: (product.price || 0) * (it.quantity || 1),
+        return {
+          ...it,
+          productId: product.id,
+          name: product.name,
+          price: product.price,
+          qty: it.quantity || 1,
+          totalPrice: (product.price || 0) * (it.quantity || 1),
 
-    // Use BASE64 image directly from backend
-    imageUrl: product.image
-      ? `data:image/jpeg;base64,${product.image}`
-      : "/placeholder-image.jpg",
-  };
-});
+          // Use BASE64 image directly from backend
+          imageUrl: product.image
+            ? `data:image/jpeg;base64,${product.image}`
+            : "/placeholder-image.jpg",
+        };
+      });
 
 
 
@@ -121,9 +125,9 @@ const formatted = items.map((it) => {
 
   const updateQtyLocal = (itemId, qty) => {
     setItems((prev) =>
-      prev.map((it) => 
-        it.id === itemId ? { 
-          ...it, 
+      prev.map((it) =>
+        it.id === itemId ? {
+          ...it,
           qty: Math.max(1, qty),
           totalPrice: (it.price || 0) * Math.max(1, qty)
         } : it
@@ -189,7 +193,7 @@ const formatted = items.map((it) => {
       showAlert("Cart is empty", "error");
       return;
     }
-    
+
     setProcessing(true);
     try {
       navigate('/checkout');
@@ -221,7 +225,7 @@ const formatted = items.map((it) => {
               <ArrowLeft size={20} />
               <span>Continue Shopping</span>
             </button>
-            
+
             <div className="header-content-pro">
               <h1 className="page-title-pro">Shopping Cart</h1>
               <p className="page-subtitle-pro">
@@ -231,218 +235,218 @@ const formatted = items.map((it) => {
           </div>
         </div>
 
-      {items.length === 0 ? (
-        <div className="shared-empty">
-          <XCircle size={80} className="shared-empty-icon" />
-          <h2 className="shared-empty-title">Your cart is empty</h2>
-          <p className="shared-empty-message">Discover our premium collection and find something you love</p>
-          <div className="empty-actions-pro">
-            <button className="shared-btn shared-btn-primary" onClick={() => navigate('/categories')}>
-              Start Shopping
-            </button>
-            <button className="shared-btn shared-btn-secondary" onClick={() => navigate('/categories')}>
-              Browse Categories
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="cart-content-pro">
-          <div className="shared-container">
-            <div className="cart-layout-pro">
-              {/* Professional Cart Items */}
-              <main className="cart-main-pro">
-                <div className="cart-items-section-pro">
-                  <div className="section-header-pro">
-                    <h2 className="section-title-pro">Cart Items</h2>
-                    <span className="items-count-pro">{items.length} items</span>
-                  </div>
-                  
-                  <div className="cart-items-pro">
-                    {items.map((item, index) => (
-                      <div 
-                        className="cart-item-pro" 
-                        key={item.id}
-                        style={{ '--delay': `${index * 0.1}s` }}
-                      >
-                        <div className="item-image-pro">
-                          <img 
-                            src={item.imageUrl} 
-                            onClick={() => navigate(`/product/${item.productId}`)}
-                            alt={item.name}
-                            onError={(e) => {
-                              e.target.src = '/placeholder-image.jpg';
-                            }}
-                          />
-                          <div className="image-overlay-pro"></div>
-                        </div>
-                        
-                        <div className="item-details-pro">
-                          <h3 
-                            className="item-name-pro" 
-                            onClick={() => navigate(`/product/${item.productId}`)}
-                          >
-                            {item.name}
-                          </h3>
-                          
-                          <div className="item-price-pro">₹{item.price?.toLocaleString()}</div>
-                          
-                          <button 
-                            className="remove-btn-pro"
-                            onClick={() => removeItem(item.id)}
-                            aria-label="Remove item"
-                          >
-                            <Trash2 size={18} />
-                            <span>Remove</span>
-                          </button>
-                        </div>
-                        
-                        <div className="item-controls-pro">
-                          <div className="quantity-selector-pro">
-                            <button 
-                              className=""
-                              onClick={() => changeQty(item.id, item.qty - 1)}
-                              disabled={item.qty <= 1}
-                              aria-label="Decrease quantity"
-                            >
-                              <Minus size={18} />
-                            </button>
-                            <span className="quantity-pro">{item.qty}</span>
-                            <button 
-                              className=""
-                              onClick={() => changeQty(item.id, item.qty + 1)}
-                              aria-label="Increase quantity"
-                            >
-                              <Plus size={18} />
-                            </button>
-                          </div>
-                          
-                          <div className="item-total-pro">
-                            ₹{item.totalPrice?.toLocaleString()}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Professional Features Strip */}
-                <div className="cart-features-pro">
-                  <div className="feature-item-pro">
-                    <div className="feature-icon-pro">
-                      <Truck size={24} />
-                    </div>
-                    <div className="feature-content-pro">
-                      <div className="feature-title-pro">Free Shipping</div>
-                      <div className="feature-desc-pro">On orders over ₹999</div>
-                    </div>
-                  </div>
-                  
-                  <div className="feature-item-pro">
-                    <div className="feature-icon-pro">
-                      <RotateCcw size={24} />
-                    </div>
-                    <div className="feature-content-pro">
-                      <div className="feature-title-pro">Easy Returns</div>
-                      <div className="feature-desc-pro">15 days hassle-free</div>
-                    </div>
-                  </div>
-                  
-                  <div className="feature-item-pro">
-                    <div className="feature-icon-pro">
-                      <ShieldCheck size={24} />
-                    </div>
-                    <div className="feature-content-pro">
-                      <div className="feature-title-pro">Secure Payment</div>
-                      <div className="feature-desc-pro">100% protected</div>
-                    </div>
-                  </div>
-                </div>
-              </main>
-
-              {/* Professional Order Summary */}
-              <aside className="cart-sidebar-pro">
-                <div className="order-summary-pro">
-                  <h3 className="summary-title-pro">Order Summary</h3>
-                  
-                  <div className="summary-items-pro">
-                    <div className="summary-row-pro">
-                      <span>Subtotal ({items.length} items)</span>
-                      <span>₹{subtotal.toLocaleString()}</span>
-                    </div>
-                    
-                    <div className="summary-row-pro">
-                      <span>Shipping</span>
-                      <span>
-                        {shipping === 0 ? (
-                          <span className="free-shipping-pro">FREE</span>
-                        ) : (
-                          `₹${shipping}`
-                        )}
-                      </span>
-                    </div>
-                    
-                    {discountAmt > 0 && (
-                      <div className="summary-row-pro discount-pro">
-                        <span>Discount</span>
-                        <span className="discount-amount-pro">-₹{discountAmt.toLocaleString()}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="coupon-section-pro">
-                    <div className="coupon-input-pro">
-                      <input
-                        type="text"
-                        placeholder="Enter coupon code"
-                        value={coupon}
-                        onChange={(e) => setCoupon(e.target.value)}
-                        className="coupon-field-pro"
-                      />
-                      <button 
-                        className="apply-coupon-pro"
-                        onClick={applyCoupon}
-                        disabled={!coupon.trim()}
-                      >
-                        Apply
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="summary-total-pro">
-                    <div className="total-row-pro">
-                      <span>Total</span>
-                      <span className="total-amount-pro">₹{total.toLocaleString()}</span>
-                    </div>
-                  </div>
-
-                  <button
-                    className="checkout-btn-pro"
-                    onClick={checkout}
-                    disabled={processing}
-                  >
-                    {processing ? (
-                      <>
-                        <div className="shared-spinner shared-spinner-small"></div>
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard size={20} />
-                        <span>Proceed to Checkout</span>
-                      </>
-                    )}
-                  </button>
-
-                  <div className="security-note-pro">
-                    <ShieldCheck size={18} />
-                    <span>Your payment information is secure and encrypted</span>
-                  </div>
-                </div>
-              </aside>
+        {items.length === 0 ? (
+          <div className="shared-empty">
+            <XCircle size={80} className="shared-empty-icon" />
+            <h2 className="shared-empty-title">Your cart is empty</h2>
+            <p className="shared-empty-message">Discover our premium collection and find something you love</p>
+            <div className="empty-actions-pro">
+              <button className="shared-btn shared-btn-primary" onClick={() => navigate('/categories')}>
+                Start Shopping
+              </button>
+              <button className="shared-btn shared-btn-secondary" onClick={() => navigate('/categories')}>
+                Browse Categories
+              </button>
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="cart-content-pro">
+            <div className="shared-container">
+              <div className="cart-layout-pro">
+                {/* Professional Cart Items */}
+                <main className="cart-main-pro">
+                  <div className="cart-items-section-pro">
+                    <div className="section-header-pro">
+                      <h2 className="section-title-pro">Cart Items</h2>
+                      <span className="items-count-pro">{items.length} items</span>
+                    </div>
+
+                    <div className="cart-items-pro">
+                      {items.map((item, index) => (
+                        <div
+                          className="cart-item-pro"
+                          key={item.id}
+                          style={{ '--delay': `${index * 0.1}s` }}
+                        >
+                          <div className="item-image-pro">
+                            <img
+                              src={item.imageUrl}
+                              onClick={() => navigate(`/product/${item.productId}`)}
+                              alt={item.name}
+                              onError={(e) => {
+                                e.target.src = '/placeholder-image.jpg';
+                              }}
+                            />
+                            <div className="image-overlay-pro"></div>
+                          </div>
+
+                          <div className="item-details-pro">
+                            <h3
+                              className="item-name-pro"
+                              onClick={() => navigate(`/product/${item.productId}`)}
+                            >
+                              {item.name}
+                            </h3>
+
+                            <div className="item-price-pro">₹{item.price?.toLocaleString()}</div>
+
+                            <button
+                              className="remove-btn-pro"
+                              onClick={() => removeItem(item.id)}
+                              aria-label="Remove item"
+                            >
+                              <Trash2 size={18} />
+                              <span>Remove</span>
+                            </button>
+                          </div>
+
+                          <div className="item-controls-pro">
+                            <div className="quantity-selector-pro">
+                              <button
+                                className=""
+                                onClick={() => changeQty(item.id, item.qty - 1)}
+                                disabled={item.qty <= 1}
+                                aria-label="Decrease quantity"
+                              >
+                                <Minus size={18} />
+                              </button>
+                              <span className="quantity-pro">{item.qty}</span>
+                              <button
+                                className=""
+                                onClick={() => changeQty(item.id, item.qty + 1)}
+                                aria-label="Increase quantity"
+                              >
+                                <Plus size={18} />
+                              </button>
+                            </div>
+
+                            <div className="item-total-pro">
+                              ₹{item.totalPrice?.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Professional Features Strip */}
+                  <div className="cart-features-pro">
+                    <div className="feature-item-pro">
+                      <div className="feature-icon-pro">
+                        <Truck size={24} />
+                      </div>
+                      <div className="feature-content-pro">
+                        <div className="feature-title-pro">Free Shipping</div>
+                        <div className="feature-desc-pro">On orders over ₹999</div>
+                      </div>
+                    </div>
+
+                    <div className="feature-item-pro">
+                      <div className="feature-icon-pro">
+                        <RotateCcw size={24} />
+                      </div>
+                      <div className="feature-content-pro">
+                        <div className="feature-title-pro">Easy Returns</div>
+                        <div className="feature-desc-pro">15 days hassle-free</div>
+                      </div>
+                    </div>
+
+                    <div className="feature-item-pro">
+                      <div className="feature-icon-pro">
+                        <ShieldCheck size={24} />
+                      </div>
+                      <div className="feature-content-pro">
+                        <div className="feature-title-pro">Secure Payment</div>
+                        <div className="feature-desc-pro">100% protected</div>
+                      </div>
+                    </div>
+                  </div>
+                </main>
+
+                {/* Professional Order Summary */}
+                <aside className="cart-sidebar-pro">
+                  <div className="order-summary-pro">
+                    <h3 className="summary-title-pro">Order Summary</h3>
+
+                    <div className="summary-items-pro">
+                      <div className="summary-row-pro">
+                        <span>Subtotal ({items.length} items)</span>
+                        <span>₹{subtotal.toLocaleString()}</span>
+                      </div>
+
+                      <div className="summary-row-pro">
+                        <span>Shipping</span>
+                        <span>
+                          {shipping === 0 ? (
+                            <span className="free-shipping-pro">FREE</span>
+                          ) : (
+                            `₹${shipping}`
+                          )}
+                        </span>
+                      </div>
+
+                      {discountAmt > 0 && (
+                        <div className="summary-row-pro discount-pro">
+                          <span>Discount</span>
+                          <span className="discount-amount-pro">-₹{discountAmt.toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="coupon-section-pro">
+                      <div className="coupon-input-pro">
+                        <input
+                          type="text"
+                          placeholder="Enter coupon code"
+                          value={coupon}
+                          onChange={(e) => setCoupon(e.target.value)}
+                          className="coupon-field-pro"
+                        />
+                        <button
+                          className="apply-coupon-pro"
+                          onClick={applyCoupon}
+                          disabled={!coupon.trim()}
+                        >
+                          Apply
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="summary-total-pro">
+                      <div className="total-row-pro">
+                        <span>Total</span>
+                        <span className="total-amount-pro">₹{total.toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      className="checkout-btn-pro"
+                      onClick={checkout}
+                      disabled={processing}
+                    >
+                      {processing ? (
+                        <>
+                          <div className="shared-spinner shared-spinner-small"></div>
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard size={20} />
+                          <span>Proceed to Checkout</span>
+                        </>
+                      )}
+                    </button>
+
+                    <div className="security-note-pro">
+                      <ShieldCheck size={18} />
+                      <span>Your payment information is secure and encrypted</span>
+                    </div>
+                  </div>
+                </aside>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <AlertModal
